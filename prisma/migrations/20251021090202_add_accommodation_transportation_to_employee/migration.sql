@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Employee" ADD COLUMN     "accommodation" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "transportation" DOUBLE PRECISION NOT NULL DEFAULT 0;
