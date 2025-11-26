@@ -1,0 +1,1459 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTHENTICATION ENUMS
+// ============================================
+
+enum EmployeeRole {
+  EMPLOYEE
+  HR
+  MANAGEMENT
+  FINANCE
+}
+
+enum EmployeeUserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+// ============================================
+// EMPLOYEE MANAGEMENT
+// ============================================
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERN
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+  EXPIRED
+}
+
+enum WorkMode {
+  ON_SITE
+  REMOTE
+  HYBRID
+}
+
+enum BankDetailChangeStatus {
+  PENDING_FINANCE
+  FINANCE_APPROVED
+  FINANCE_REJECTED
+  MANAGEMENT_APPROVED
+  MANAGEMENT_REJECTED
+}
+
+model Employee {
+  id            String    @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String    @unique
+  password      String
+  personalEmail String?
+  phone         String?
+  dateOfBirth   DateTime?
+  gender        String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  country       String?
+  timezone      String?  @default("Asia/Dubai") // IANA timezone identifier (e.g., "Asia/Dubai", "Africa/Cairo", "America/New_York")
+  molId         String?
+
+  // Authentication & User Management
+  role       EmployeeRole       @default(EMPLOYEE)
+  userStatus EmployeeUserStatus @default(ACTIVE)
+  lastLogin  DateTime?
+
+  // Employment Info
+  employeeId         String         @unique
+  departmentId       String
+  designation        String
+  employmentType     EmploymentType @default(FULL_TIME)
+  status             EmployeeStatus @default(ACTIVE)
+  workMode           WorkMode       @default(ON_SITE)
+  joinDate           DateTime
+  probationPeriod    String?
+  confirmationDate   DateTime?
+  contractDuration   String?        @default("Permanent")
+  contractExpiryDate DateTime?
+  terminationDate    DateTime?
+  terminationReason  String?
+  terminationLastWorkingDay DateTime?
+  terminationRecordedAt     DateTime?
+  terminatedById            String?
+  managerId          String?
+
+  terminatedBy        Employee?          @relation("EmployeeTerminationAction", fields: [terminatedById], references: [id], onDelete: SetNull)
+  terminationsHandled Employee[]         @relation("EmployeeTerminationAction")
+
+  // Salary Info
+  baseSalary              Float // Core salary
+  telephoneAllowance      Float  @default(0) // Telephone allowance
+  housingAllowance        Float  @default(0) // Housing allowance
+  transportationAllowance Float  @default(0) // Transportation allowance
+  totalSalary             Float // baseSalary + telephoneAllowance + housingAllowance + transportationAllowance
+  currency                String @default("AED")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  // Relations
+  department               Department         @relation(fields: [departmentId], references: [id])
+  manager                  Employee?          @relation("ManagerRelation", fields: [managerId], references: [id], onDelete: SetNull)
+  subordinates             Employee[]         @relation("ManagerRelation")
+  leaveSummaries           LeaveSummary[]
+  leaveRequests            LeaveRequest[]
+  makeupHours              MakeupHours[]
+  assignedAssets           Asset[]            @relation("AssignedAssets")
+  payroll                  Payroll[]
+  bonuses                  Bonus[]
+  documents                EmployeeDocument[]
+  bankDetails              EmployeeBank?
+  announcements            Announcement[]
+  reimbursements           Reimbursement[]
+  attendance               Attendance[]
+  overtimes                Overtime[]
+  overtimeRequests         OvertimeRequest[]
+  approvedOvertimeRequests OvertimeRequest[]  @relation("OvertimeApprover")
+  overtimeApprovals        OvertimeApproval[] @relation("OvertimeApprovalApprover")
+  deductions               Deduction[]
+  salaryChanges            SalaryChange[]
+  contract                 Contract? // Active contract
+  bankDetailChangeRequests BankDetailChangeRequest[] @relation("BankDetailChangeRequestEmployee")
+  bankDetailChangeRequestsSubmitted BankDetailChangeRequest[] @relation("BankDetailChangeRequestRequestedBy")
+  bankDetailChangeRequestsFinanceReviewed BankDetailChangeRequest[] @relation("BankDetailChangeRequestFinanceReviewer")
+  bankDetailChangeRequestsManagementReviewed BankDetailChangeRequest[] @relation("BankDetailChangeRequestManagementReviewer")
+
+  @@index([departmentId])
+  @@index([email])
+  @@index([status])
+  @@index([managerId])
+  @@index([role])
+}
+
+model BankDetailChangeRequest {
+  id                   String                   @id @default(cuid())
+  employeeId           String
+  requestedById        String
+  status               BankDetailChangeStatus    @default(PENDING_FINANCE)
+  financeReviewerId    String?
+  financeReviewedAt    DateTime?
+  financeNotes         String?
+  managementReviewerId String?
+  managementReviewedAt DateTime?
+  managementNotes      String?
+  requestNotes         String?
+  currentPaymentMethod String?
+  currentBankName      String?
+  currentAccountHolder String?
+  currentIban          String?
+  currentRoutingNumber String?
+  newPaymentMethod     String?
+  newBankName          String?
+  newAccountHolder     String?
+  newIban              String?
+  newRoutingNumber     String?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+
+  employee           Employee @relation("BankDetailChangeRequestEmployee", fields: [employeeId], references: [id], onDelete: Cascade)
+  requestedBy        Employee @relation("BankDetailChangeRequestRequestedBy", fields: [requestedById], references: [id], onDelete: Cascade)
+  financeReviewer    Employee? @relation("BankDetailChangeRequestFinanceReviewer", fields: [financeReviewerId], references: [id], onDelete: SetNull)
+  managementReviewer Employee? @relation("BankDetailChangeRequestManagementReviewer", fields: [managementReviewerId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId])
+  @@index([requestedById])
+  @@index([status])
+  @@index([financeReviewerId])
+  @@index([managementReviewerId])
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  employees     Employee[]
+  announcements AnnouncementDepartment[]
+
+  @@index([name])
+}
+
+// ============================================
+// EMPLOYEE DOCUMENTS & BANK DETAILS
+// ============================================
+
+enum DocumentType {
+  PASSPORT
+  EMIRATES_ID
+  CERTIFICATE
+  OTHER
+}
+
+model EmployeeDocument {
+  id           String       @id @default(cuid())
+  employeeId   String
+  documentType DocumentType
+  name         String
+  url          String
+  uploadedAt   DateTime     @default(now())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relations
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([documentType])
+}
+
+model EmployeeBank {
+  id                String   @id @default(cuid())
+  employeeId        String   @unique
+  paymentMethod     String
+  bankName          String
+  accountHolderName String
+  iban              String
+  routingNumber     String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+}
+
+// ============================================
+// ATTENDANCE MANAGEMENT
+// ============================================
+
+model Attendance {
+  id         String   @id @default(cuid())
+  employeeId String
+  date       DateTime @db.Date
+
+  // Original shift times
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+
+  // Overtime shift times (if employee re-checks in for overtime)
+  overtimeCheckInTime  DateTime?
+  overtimeCheckOutTime DateTime?
+
+  // Break management
+  breakStartTime    DateTime?
+  breakEndTime      DateTime?
+  totalBreakMinutes Float     @default(0) // Total break time in minutes
+  isOnBreak         Boolean   @default(false) // Current break status
+
+  // Calculated hours
+  hoursWorked Float @default(0) // Regular hours (excluding break time)
+  overtime    Float @default(0) // Overtime hours
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  // Relations
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, date])
+  @@index([employeeId])
+  @@index([date])
+}
+
+// ============================================
+// LEAVE MANAGEMENT
+// ============================================
+
+enum LeaveType {
+  ANNUAL
+  SICK
+  MATERNITY
+  EMERGENCY
+  TOIL
+  WFH
+  BEREAVEMENT
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model LeaveTypeColor {
+  id          String    @id @default(cuid())
+  leaveType   LeaveType @unique
+  name        String
+  hexColor    String    @default("#CCCCCC")
+  shortcut    String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([leaveType])
+}
+
+model LeaveSummary {
+  id         String @id @default(cuid())
+  employeeId String
+  year       Int
+
+  // Annual Leave - MOHRE: 30 days/year (after 1 year) or 2 days/month (6-12 months)
+  annualLeaveEntitlement Int   @default(30)
+  annualLeaveUsed        Float @default(0)
+  annualLeaveCarriedOver Float @default(0)
+
+  // Sick Leave - MOHRE: 90 days total (15 full pay + 30 half pay + 45 unpaid)
+  sickLeaveFullPay Int   @default(15)
+  sickLeaveHalfPay Int   @default(30)
+  sickLeaveUnpaid  Int   @default(45)
+  sickLeaveUsed    Float @default(0)
+
+  // Maternity Leave - MOHRE: 60 days (45 full pay + 15 half pay)
+  maternityLeaveEntitlement Int   @default(60)
+  maternityLeaveUsed        Float @default(0)
+
+  // WFH - Company Policy (not MOHRE)
+  wfhMonthlyLimit  Int       @default(4)
+  wfhWeeklyLimit   Int       @default(1)
+  wfhUsedThisMonth Int       @default(0)
+  wfhUsedThisWeek  Int       @default(0)
+  wfhLastWeekStart DateTime? // Track week start for weekly reset
+
+  // Emergency Leave - Company Policy
+  emergencyLeaveEntitlement Int   @default(5)
+  emergencyLeaveUsed        Float @default(0)
+
+  // TOIL - Based on approved overtime (1 day = 8 hours)
+  toilHoursAvailable Float @default(0)
+  toilHoursUsed      Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, year])
+  @@index([employeeId])
+  @@index([year])
+}
+
+model LeaveRequest {
+  id         String    @id @default(cuid())
+  employeeId String
+  leaveType  LeaveType
+
+  // Smart Date Management
+  startDate    DateTime @db.Date
+  endDate      DateTime @db.Date
+  isHalfDay    Boolean  @default(false)
+  numberOfDays Float // Changed from Int to support 0.5 days
+
+  // Leave-Specific Fields (only populated when relevant)
+  compensationMethod String? // For EMERGENCY: 'unpaid' | 'annual_leave' | 'makeup_hours'
+  relationship       String? // For BEREAVEMENT: 'spouse' | 'parent' | 'child' | 'sibling' | 'grandparent' | 'grandchild'
+  overtimeRequestIds String[] @default([]) // For TOIL: Array of overtime request IDs
+
+  reason String?
+  status LeaveStatus @default(PENDING)
+
+  // Approval Tracking
+  approvedBy      String?
+  approvalDate    DateTime?
+  rejectionReason String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  // Auto-calculated metadata (for reporting, no user input needed)
+  autoCalculated Json? // Stores: weekly/monthly WFH counts, balance checks, etc.
+
+  // Relations
+  employee    Employee               @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  documents   LeaveRequestDocument[]
+  makeupHours MakeupHours?
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([startDate])
+  @@index([leaveType])
+}
+
+model LeaveRequestDocument {
+  id             String   @id @default(cuid())
+  leaveRequestId String
+  fileName       String
+  fileType       String // e.g., "application/pdf", "image/jpeg"
+  url            String
+  uploadDate     DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  leaveRequest LeaveRequest @relation(fields: [leaveRequestId], references: [id], onDelete: Cascade)
+
+  @@index([leaveRequestId])
+}
+
+model MakeupHours {
+  id             String    @id @default(cuid())
+  employeeId     String
+  leaveRequestId String    @unique // Link to the emergency leave request that requires makeup
+  requiredHours  Float // Hours that need to be worked (1 day = 8 hours typically)
+  completedHours Float     @default(0)
+  payPeriodMonth Int // Month when makeup must be completed
+  payPeriodYear  Int // Year when makeup must be completed
+  status         String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, OVERDUE
+  completionDate DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveRequest LeaveRequest @relation(fields: [leaveRequestId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([leaveRequestId])
+  @@index([payPeriodYear, payPeriodMonth])
+  @@index([status])
+}
+
+enum HolidayTypeEnum {
+  PUBLIC_HOLIDAY
+  COMPANY_HOLIDAY
+  OPTIONAL_HOLIDAY
+  SPECIAL_HOLIDAY
+}
+
+model HolidayType {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  description String?
+  type        HolidayTypeEnum
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  holidays Holiday[]
+
+  @@index([type])
+}
+
+model Holiday {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  holidayTypeId String
+  duration      Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  holidayType HolidayType @relation(fields: [holidayTypeId], references: [id], onDelete: Cascade)
+
+  @@index([startDate])
+  @@index([holidayTypeId])
+}
+
+// ============================================
+// FINANCE & PAYROLL
+// ============================================
+
+enum PayrollStatus {
+  PENDING              // Initial status (auto-set, cannot be manually changed)
+  ON_HOLD              // Put on hold by Finance or Management (needs attention)
+  FINANCE_APPROVED     // After Finance approval
+  MANAGEMENT_APPROVED  // After Management approval
+  UPLOADED_TO_BANK     // After Finance uploads to bank
+  BANK_PAYMENT_APPROVED // After Management confirms payment in bank (Paid)
+  REJECTED             // Rejected - goes back to PENDING for Finance to fix
+}
+
+model Payroll {
+  id           String        @id @default(cuid())
+  employeeId   String
+  month        Int
+  year         Int
+  baseSalary   Float
+  totalSalary  Float
+  allowances   Float         @default(0)
+  deductions   Float         @default(0)
+  taxDeduction Float         @default(0)
+  netSalary    Float
+  status       PayrollStatus @default(PENDING)
+  paidDate     DateTime?
+  
+  // Approval tracking fields (no notes for approvals, only for reject/on hold)
+  financeApprovedAt     DateTime?
+  financeApprovedBy     String?
+  
+  managementApprovedAt     DateTime?
+  managementApprovedBy     String?
+  
+  uploadedToBankAt      DateTime?
+  uploadedToBankBy      String?
+  bankUploadReference   String? // Bank reference number/confirmation
+  
+  bankPaymentApprovedAt  DateTime?
+  bankPaymentApprovedBy  String?
+  bankPaymentReference   String? // Bank confirmation reference (Paid)
+  
+  // On Hold tracking (Finance or Management can put on hold)
+  onHoldAt            DateTime? // Most recent hold date
+  onHoldBy            String? // Most recent hold by
+  onHoldReason        String? // Most recent hold reason
+  onHoldHistory       Json? // Array of all hold records: [{at: DateTime, by: String, reason: String}]
+  
+  // Rejection tracking (rejected records go back to PENDING for Finance to fix)
+  rejectedAt            DateTime?
+  rejectedBy            String?
+  rejectionReason       String? // Required reason for rejection
+  rejectedAtStage       PayrollStatus? // Which stage was it rejected at
+  
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  createdBy    String?
+  updatedBy    String?
+
+  // Relations
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, month, year])
+  @@index([employeeId])
+  @@index([status])
+}
+
+enum ReimbursementStatus {
+  PENDING
+  ON_HOLD
+  FINANCE_APPROVED
+  MANAGEMENT_APPROVED
+  UPLOADED_TO_BANK
+  PAID
+  REJECTED
+  APPROVED // Legacy status (mapped to MANAGEMENT_APPROVED during migration)
+}
+
+model ReimbursementType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  reimbursements Reimbursement[]
+
+  @@index([isActive])
+}
+
+model Reimbursement {
+  id                  String              @id @default(cuid())
+  employeeId          String
+  reimbursementTypeId String
+  amount              Float
+  description         String
+  receiptUrl          String?
+  expenseDate         DateTime
+  status              ReimbursementStatus @default(PENDING)
+  financeApprovedAt   DateTime?
+  financeApprovedBy   String?
+  managementApprovedAt DateTime?
+  managementApprovedBy String?
+  uploadedToBankAt     DateTime?
+  uploadedToBankBy     String?
+  bankUploadReference  String?
+  bankPaymentApprovedAt DateTime?
+  bankPaymentApprovedBy String?
+  bankPaymentReference  String?
+  paidDate             DateTime?
+  onHoldAt             DateTime?
+  onHoldBy             String?
+  onHoldReason         String?
+  rejectedAt           DateTime?
+  rejectedBy           String?
+  rejectionReason      String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  createdBy           String?
+  updatedBy           String?
+
+  // Relations
+  employee          Employee          @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  reimbursementType ReimbursementType @relation(fields: [reimbursementTypeId], references: [id], onDelete: Restrict)
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([reimbursementTypeId])
+  @@index([expenseDate])
+}
+
+model BonusType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  bonuses Bonus[]
+
+  @@index([isActive])
+}
+
+model Bonus {
+  id          String   @id @default(cuid())
+  employeeId  String
+  bonusTypeId String
+  amount      Float
+  reason      String
+  bonusDate   DateTime @db.Date
+  status      BonusStatus @default(PENDING)
+  financeApprovedAt   DateTime?
+  financeApprovedBy   String?
+  managementApprovedAt DateTime?
+  managementApprovedBy String?
+  readyForPayrollAt   DateTime?
+  readyForPayrollBy   String?
+  payrollReference    String?
+  appliedToPayrollAt  DateTime?
+  appliedToPayrollBy  String?
+  onHoldAt            DateTime?
+  onHoldBy            String?
+  onHoldReason        String?
+  rejectedAt          DateTime?
+  rejectedBy          String?
+  rejectionReason     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  // Relations
+  employee  Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  bonusType BonusType @relation(fields: [bonusTypeId], references: [id], onDelete: Restrict)
+
+  @@index([employeeId])
+  @@index([bonusTypeId])
+  @@index([status])
+  @@index([bonusDate])
+}
+
+enum BonusStatus {
+  PENDING
+  ON_HOLD
+  FINANCE_APPROVED
+  MANAGEMENT_APPROVED
+  READY_FOR_PAYROLL
+  APPLIED_TO_PAYROLL
+  REJECTED
+}
+
+// ============================================
+// CLIENT & PROJECT MANAGEMENT
+// ============================================
+
+model Client {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  country     String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  projects         Project[]
+  overtimeRequests OvertimeRequest[]
+
+  @@index([isActive])
+  @@index([name])
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  clientId    String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  client           Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  overtimeRequests OvertimeRequest[]
+
+  @@unique([name, clientId])
+  @@index([clientId])
+  @@index([isActive])
+}
+
+// ============================================
+// OVERTIME MANAGEMENT
+// ============================================
+
+enum OvertimeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OvertimeApprovalAction {
+  APPROVED
+  REJECTED
+  RECALLED
+  MODIFIED
+}
+
+model OvertimeRequest {
+  id              String         @id @default(cuid())
+  employeeId      String
+  clientId        String
+  projectId       String
+  requestedDate   DateTime       @db.Date
+  reason          String // Why couldn't deliver during working hours
+  canDoNextDay    Boolean        @default(false)
+  urgencyReason   String? // Explanation if canDoNextDay is false
+  requestedHours  Float // How many hours needed
+  status          OvertimeStatus @default(PENDING)
+  approvedBy      String? // Line manager ID
+  approvalDate    DateTime?
+  rejectionReason String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  createdBy       String?
+  updatedBy       String?
+
+  // Relations
+  employee        Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  client          Client             @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  project         Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  approver        Employee?          @relation("OvertimeApprover", fields: [approvedBy], references: [id], onDelete: SetNull)
+  approvalHistory OvertimeApproval[] @relation("OvertimeRequestApprovals")
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([requestedDate])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([approvedBy])
+}
+
+// ============================================
+// OVERTIME APPROVAL TRACKING
+// ============================================
+
+model OvertimeApproval {
+  id                String                 @id @default(cuid())
+  overtimeRequestId String
+  approvedBy        String // Employee ID of approver
+  action            OvertimeApprovalAction // APPROVED, REJECTED, RECALLED, MODIFIED
+  approvalDate      DateTime               @default(now())
+  comments          String? // Additional comments from approver
+  previousStatus    OvertimeStatus? // Previous status before this action
+  previousHours     Float? // Previous hours if modified
+  newHours          Float? // New hours if modified
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  createdBy         String?
+  updatedBy         String?
+
+  // Relations
+  overtimeRequest OvertimeRequest @relation("OvertimeRequestApprovals", fields: [overtimeRequestId], references: [id], onDelete: Cascade)
+  approver        Employee        @relation("OvertimeApprovalApprover", fields: [approvedBy], references: [id], onDelete: Cascade)
+
+  @@index([overtimeRequestId])
+  @@index([approvedBy])
+  @@index([action])
+  @@index([approvalDate])
+}
+
+model Overtime {
+  id              String         @id @default(cuid())
+  employeeId      String
+  date            DateTime       @db.Date
+  hoursWorked     Float
+  overtimeHours   Float
+  rate            Float // 1.25 or 1.5
+  amount          Float
+  status          OvertimeStatus @default(PENDING)
+  approvedBy      String?
+  approvalDate    DateTime?
+  rejectionReason String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  createdBy       String?
+  updatedBy       String?
+
+  // Relations
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([date])
+}
+
+// ============================================
+// DEDUCTION MANAGEMENT
+// ============================================
+
+enum DeductionStatus {
+  PENDING
+  ON_HOLD
+  FINANCE_APPROVED
+  MANAGEMENT_APPROVED
+  READY_FOR_PAYROLL
+  APPLIED_TO_PAYROLL
+  REJECTED
+  APPROVED // Legacy status (mapped to APPLIED_TO_PAYROLL during migration)
+}
+
+model DeductionType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  deductions Deduction[]
+
+  @@index([isActive])
+}
+
+model Deduction {
+  id              String          @id @default(cuid())
+  employeeId      String
+  deductionTypeId String
+  amount          Float
+  reason          String
+  deductionDate   DateTime        @db.Date
+  status          DeductionStatus @default(PENDING)
+  financeApprovedAt    DateTime?
+  financeApprovedBy    String?
+  managementApprovedAt DateTime?
+  managementApprovedBy String?
+  readyForPayrollAt    DateTime?
+  readyForPayrollBy    String?
+  payrollReference     String?
+  appliedToPayrollAt   DateTime?
+  appliedToPayrollBy   String?
+  onHoldAt             DateTime?
+  onHoldBy             String?
+  onHoldReason         String?
+  rejectedAt           DateTime?
+  rejectedBy           String?
+  rejectionReason      String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  createdBy       String?
+  updatedBy       String?
+
+  // Relations
+  employee      Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  deductionType DeductionType @relation(fields: [deductionTypeId], references: [id], onDelete: Restrict)
+
+  @@index([employeeId])
+  @@index([deductionTypeId])
+  @@index([status])
+  @@index([deductionDate])
+}
+
+// ============================================
+// SALARY CHANGE MANAGEMENT
+// ============================================
+
+enum SalaryChangeType {
+  PROMOTION
+  INCREMENT
+  PERFORMANCE
+  PERFORMANCE_BONUS
+  PROBATION_COMPLETION
+  CONTRACT_RENEWAL
+  INDUSTRY_STANDARD
+  ADJUSTMENT
+  OTHER
+}
+
+enum SalaryChangeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model SalaryChange {
+  id                         String             @id @default(cuid())
+  employeeId                 String
+  // Old salary components
+  oldBaseSalary              Float
+  oldTelephoneAllowance      Float              @default(0)
+  oldHousingAllowance        Float              @default(0)
+  oldTransportationAllowance Float              @default(0)
+  oldTotalSalary             Float
+  // New salary components
+  newBaseSalary              Float
+  newTelephoneAllowance      Float              @default(0)
+  newHousingAllowance        Float              @default(0)
+  newTransportationAllowance Float              @default(0)
+  newTotalSalary             Float // Auto-calculated: newBaseSalary + newTelephoneAllowance + newHousingAllowance + newTransportationAllowance
+  changeType                 SalaryChangeType
+  reason                     String
+  effectiveDate              DateTime
+  status                     SalaryChangeStatus @default(PENDING)
+  approvedBy                 String?
+  approvedDate               DateTime?
+  rejectionReason            String?
+  rejectedBy                 String?
+  rejectedDate               DateTime?
+  createdAt                  DateTime           @default(now())
+  updatedAt                  DateTime           @updatedAt
+  createdBy                  String?
+  updatedBy                  String?
+
+  // Relations
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([effectiveDate])
+}
+
+// ============================================
+// ANNOUNCEMENTS
+// ============================================
+
+enum AnnouncementPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AnnouncementStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Announcement {
+  id          String               @id @default(cuid())
+  createdBy   String
+  title       String
+  content     String
+  priority    AnnouncementPriority @default(MEDIUM)
+  status      AnnouncementStatus   @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  // Relations
+  creator           Employee                 @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  targetDepartments AnnouncementDepartment[]
+
+  @@index([createdBy])
+  @@index([status])
+}
+
+model AnnouncementDepartment {
+  id             String @id @default(cuid())
+  announcementId String
+  departmentId   String
+
+  // Relations
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  department   Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, departmentId])
+  @@index([announcementId])
+  @@index([departmentId])
+}
+
+// ============================================
+// INVENTORY MANAGEMENT - UNIFIED ASSET SYSTEM
+// ============================================
+
+enum AssetStatus {
+  AVAILABLE // Available for assignment
+  ASSIGNED // Currently assigned to employee
+  IN_USE // In use but not assigned (shared equipment)
+  MAINTENANCE // Under maintenance/repair
+  RETIRED // Retired/disposed
+  LOST // Lost or stolen
+  DAMAGED // Damaged, needs repair
+}
+
+enum AssetType {
+  MAIN_ASSET // Laptops, phones, cameras, etc.
+  ACCESSORY // Chargers, cables, stands, etc.
+  SOFTWARE // Software licenses
+  FURNITURE // Desks, chairs, etc.
+}
+
+enum AssetCategory {
+  // Main Asset Categories
+  LAPTOP
+  MOBILE
+  TABLET
+  MONITOR
+  CAMERA
+  AUDIO_EQUIPMENT
+  LIGHTING
+  STORAGE
+  NETWORKING
+  PRINTER_SCANNER
+  // Accessory Categories
+  CABLES_ACCESSORIES
+  KEYBOARD
+  MOUSE
+  HEADPHONES
+  CHARGER
+  // Furniture Categories
+  DESK
+  CHAIR
+  CABINET
+  SHELVING
+  // Software Categories
+  SOFTWARE_LICENSE
+  // Other
+  OTHER
+}
+
+enum AssetCondition {
+  NEW
+  USED
+  DAMAGED
+}
+
+// Manufacturer Model
+model Manufacturer {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  assets Asset[]
+
+  @@index([name])
+}
+
+// Supplier Model
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  contactName String?
+  email       String?
+  phone       String?
+  address     String?
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  assets Asset[]
+
+  @@index([name])
+}
+
+// Unified Asset Model - Single source of truth
+model Asset {
+  id String @id @default(cuid())
+
+  // Basic Information
+  name         String // "MacBook Pro 16\" M3"
+  assetTag     String? @unique // Internal tag like "YAZ-001"
+  serialNumber String? // Manufacturer serial (not unique, some assets may not have)
+  model        String? // "MacBook Pro 16\""
+  qrCode       String? @unique // Auto-generated QR code URL
+
+  // Classification
+  assetType      AssetType     @default(MAIN_ASSET)
+  category       AssetCategory
+  manufacturerId String?
+  supplierId     String?
+
+  // Financial
+  purchaseDate       DateTime?
+  purchaseCost       Float?
+  currency           String    @default("AED")
+  currentValue       Float? // Depreciated value
+  depreciationMonths Int? // Depreciation period
+  warrantyExpiry     DateTime?
+
+  // Physical
+  location    String? // "HQ - Floor 2 - Desk 5"
+  condition   AssetCondition @default(NEW)
+  description String?
+  notes       String?
+
+  // Status & Assignment
+  status               AssetStatus @default(AVAILABLE)
+  assignedToEmployeeId String?
+  assignedDate         DateTime?
+  assignedBy           String? // Employee ID who assigned
+
+  // Files & Media
+  imageUrl   String? // Renamed from assetImageUrl
+  invoiceUrl String?
+  documents  AssetDocument[] // Multiple documents support
+
+  // Maintenance Tracking
+  lastMaintenanceDate DateTime?
+  nextMaintenanceDate DateTime?
+  maintenanceHistory  AssetMaintenance[]
+
+  // Audit Trail
+  checkoutHistory AssetCheckout[]
+
+  // Timestamps
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  createdBy      String?
+  updatedBy      String?
+  lastActionDate DateTime?
+
+  // Relations
+  assignedTo   Employee?     @relation("AssignedAssets", fields: [assignedToEmployeeId], references: [id], onDelete: SetNull)
+  manufacturer Manufacturer? @relation(fields: [manufacturerId], references: [id], onDelete: SetNull)
+  supplier     Supplier?     @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([assetType])
+  @@index([category])
+  @@index([assignedToEmployeeId])
+  @@index([manufacturerId])
+  @@index([supplierId])
+  @@index([assetTag])
+  @@index([qrCode])
+  @@index([serialNumber])
+}
+
+// Asset Documents (invoices, warranties, etc.)
+model AssetDocument {
+  id           String   @id @default(cuid())
+  assetId      String
+  documentType String // "INVOICE", "WARRANTY", "MANUAL", "CONTRACT"
+  name         String
+  url          String
+  uploadedAt   DateTime @default(now())
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+}
+
+// Maintenance History
+model AssetMaintenance {
+  id              String    @id @default(cuid())
+  assetId         String
+  maintenanceType String // "REPAIR", "SERVICE", "CLEANING", "UPGRADE"
+  description     String
+  cost            Float?
+  performedBy     String? // Employee ID or vendor
+  performedDate   DateTime
+  nextDueDate     DateTime? // For scheduled maintenance
+  notes           String?
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@index([performedDate])
+}
+
+// Checkout/Checkin History (Audit Trail)
+model AssetCheckout {
+  id                 String    @id @default(cuid())
+  assetId            String
+  action             String // "CHECKOUT", "CHECKIN", "TRANSFER", "RETURN"
+  fromEmployeeId     String? // Previous assignee
+  toEmployeeId       String? // New assignee
+  performedBy        String // Employee who performed action
+  notes              String?
+  checkoutDate       DateTime  @default(now())
+  expectedReturnDate DateTime?
+  actualReturnDate   DateTime?
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@index([toEmployeeId])
+  @@index([checkoutDate])
+}
+
+// ============================================
+// CONTRACT MANAGEMENT SYSTEM
+// ============================================
+
+enum ContractType {
+  FIXED_TERM // Contract with specific end date
+  PERMANENT // Permanent employment
+  PROBATIONARY // Probation period contract
+  CONSULTANT // Consultant/freelance contract
+  INTERN // Internship contract
+}
+
+enum ContractStatus {
+  ACTIVE // Currently active
+  PENDING // Pending approval/activation
+  EXPIRED // Contract expired (auto-set)
+  RENEWED // Contract renewed, replaced by new contract
+  TERMINATED // Contract terminated early
+  CANCELLED // Contract cancelled before start
+}
+
+enum RenewalType {
+  AUTOMATIC // Auto-renewed based on settings
+  MANUAL // Manually initiated renewal
+  EXTENSION // Contract extension (same terms)
+  RE_NEGOTIATION // Renewal with new terms
+}
+
+enum RenewalStatus {
+  PENDING // Awaiting approval
+  APPROVED // Approved, pending execution
+  REJECTED // Renewal rejected
+  COMPLETED // Renewal processed and new contract created
+  CANCELLED // Renewal cancelled
+}
+
+enum AmendmentType {
+  SALARY_CHANGE
+  POSITION_CHANGE
+  TERMS_CHANGE
+  ALLOWANCE_CHANGE
+  WORK_MODE_CHANGE
+  OTHER
+}
+
+enum AmendmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IMPLEMENTED
+}
+
+enum ContractDocumentType {
+  ORIGINAL // Original signed contract
+  RENEWAL // Renewal document
+  AMENDMENT // Amendment/addendum
+  TERMINATION // Termination letter
+  SIGNED_COPY // Signed copy
+  DRAFT // Draft version
+  OTHER
+}
+
+// Main Contract Model
+model Contract {
+  id         String   @id @default(cuid())
+  employeeId String   @unique
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  // Contract Details
+  contractNumber String         @unique // Auto-generated: CT-YYYY-XXX
+  contractType   ContractType   @default(FIXED_TERM)
+  status         ContractStatus @default(ACTIVE)
+
+  // Dates
+  startDate       DateTime
+  endDate         DateTime? // Null for permanent contracts
+  renewalDate     DateTime? // Date when renewal was processed
+  terminationDate DateTime?
+
+  // Financial Terms
+  baseSalary Float
+  allowances String? // JSON string for flexible allowances
+  currency   String  @default("AED")
+
+  // Terms & Conditions
+  probationPeriod Int? // Days
+  noticePeriod    Int? // Days required for termination
+  workingHours    Int? // Hours per week
+  workMode        WorkMode @default(ON_SITE)
+
+  // Renewal Settings
+  autoRenewal         Boolean @default(false)
+  renewalDuration     Int? // Days/Months for next renewal
+  renewalReminderDays Int     @default(30) // Days before expiry to send reminder
+
+  // Additional Info
+  notes     String?
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  renewals   ContractRenewal[]
+  documents  ContractDocument[]
+  amendments ContractAmendment[]
+  template   ContractTemplate?   @relation(fields: [templateId], references: [id])
+  templateId String?
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([endDate])
+  @@index([contractType])
+  @@index([contractNumber])
+}
+
+// Contract Renewal History
+model ContractRenewal {
+  id         String   @id @default(cuid())
+  contractId String
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  // Renewal Details
+  renewalType   RenewalType
+  newContractId String? // Reference to new contract if created
+
+  // Terms Changes
+  previousEndDate DateTime
+  newEndDate      DateTime
+  previousSalary  Float
+  newSalary       Float?
+  changes         String? // JSON string for structured changes log
+
+  // Approval
+  status          RenewalStatus @default(PENDING)
+  requestedBy     String?
+  approvedBy      String?
+  approvalDate    DateTime?
+  rejectionReason String?
+
+  // Dates
+  requestedDate DateTime @default(now())
+  effectiveDate DateTime
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([contractId])
+  @@index([status])
+  @@index([effectiveDate])
+}
+
+// Contract Amendments
+model ContractAmendment {
+  id         String   @id @default(cuid())
+  contractId String
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  // Amendment Details
+  amendmentType AmendmentType
+  title         String
+  description   String
+
+  // Changes
+  previousValue String? // JSON string
+  newValue      String? // JSON string
+
+  // Approval
+  status        AmendmentStatus @default(PENDING)
+  requestedBy   String?
+  approvedBy    String?
+  approvalDate  DateTime?
+  effectiveDate DateTime
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([contractId])
+  @@index([status])
+  @@index([effectiveDate])
+}
+
+// Contract Documents
+model ContractDocument {
+  id         String   @id @default(cuid())
+  contractId String
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  documentType ContractDocumentType
+  fileName     String
+  fileUrl      String
+  fileSize     Int? // Bytes
+  mimeType     String?
+
+  uploadedBy String?
+  uploadedAt DateTime @default(now())
+
+  @@index([contractId])
+  @@index([documentType])
+}
+
+// Contract Templates
+model ContractTemplate {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+
+  // Template Settings
+  contractType           ContractType
+  defaultDuration        Int? // Days
+  defaultNoticePeriod    Int?
+  defaultProbationPeriod Int?
+
+  // Template Content
+  terms   String? // JSON string for structured contract terms
+  clauses String? // JSON string for contract clauses
+
+  // Settings
+  isActive  Boolean @default(true)
+  isDefault Boolean @default(false)
+
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contracts Contract[]
+
+  @@index([contractType])
+  @@index([isActive])
+}

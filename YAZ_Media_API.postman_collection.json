@@ -1,0 +1,2936 @@
+{
+  "info": {
+    "_postman_id": "yaz-media-api",
+    "name": "YAZ Media Dashboard API",
+    "description": "API collection for YAZ Media Dashboard - HR & Company Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.data && jsonData.data.token) {",
+              "        pm.environment.set('token', jsonData.data.token);",
+              "        console.log('✅ Token saved to environment');",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.token) {",
+                  "        pm.environment.set('token', jsonData.data.token);",
+                  "        console.log('✅ Token saved to environment: ' + jsonData.data.token.substring(0, 20) + '...');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@yazmedia.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login with email and password to get JWT token. Token will be automatically saved to {{token}} variable."
+          },
+          "response": [
+            {
+              "name": "Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@yazmedia.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/auth/login",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbHg5YzBkZjAwMDAwMDAwMDAwMDAwMDAwIiwiZW1haWwiOiJhZG1pbkB5YXptZWRpYS5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE2OTc1MjM0NTAsImV4cCI6MTY5ODEyODI1MH0.abc123\",\n    \"user\": {\n      \"id\": \"clx9c0df0000000000000000\",\n      \"email\": \"admin@yazmedia.com\",\n      \"firstName\": \"Admin\",\n      \"lastName\": \"User\",\n      \"role\": \"ADMIN\",\n      \"status\": \"ACTIVE\",\n      \"createdAt\": \"2025-10-16T08:49:30.000Z\",\n      \"updatedAt\": \"2025-10-16T08:49:30.000Z\"\n    }\n  },\n  \"message\": \"Login successful\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "JWT token from login response"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/auth/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Get current authenticated user profile"
+          },
+          "response": [
+            {
+              "name": "Get Current User Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/auth/me",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx9c0df0000000000000000\",\n    \"email\": \"admin@yazmedia.com\",\n    \"firstName\": \"Admin\",\n    \"lastName\": \"User\",\n    \"fullName\": \"Admin User\",\n    \"employeeId\": \"ADMIN001\",\n    \"role\": \"ADMIN\",\n    \"userStatus\": \"ACTIVE\",\n    \"lastLogin\": \"2025-10-16T10:30:45.000Z\",\n    \"createdAt\": \"2025-10-16T08:49:30.000Z\",\n    \"updatedAt\": \"2025-10-16T10:30:45.000Z\"\n  },\n  \"message\": \"Employee retrieved successfully\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "Get All Employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/employees?page=1&pageSize=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "disabled": true
+                },
+                {
+                  "key": "departmentId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "workMode",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all employees with pagination and filters"
+          },
+          "response": [
+            {
+              "name": "Get All Employees Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/employees?page=1&pageSize=10&status=ACTIVE",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees"],
+                  "query": [{"key": "page", "value": "1"}, {"key": "pageSize", "value": "10"}, {"key": "status", "value": "ACTIVE"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"id\": \"clx9c0df0000000000000001\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"fullName\": \"John Doe\",\n        \"email\": \"john.doe@yazmedia.com\",\n        \"phone\": \"+1234567890\",\n        \"employeeId\": \"EMP001\",\n        \"departmentId\": \"clx9c0df0000000000000100\",\n        \"designation\": \"Software Engineer\",\n        \"employmentType\": \"FULL_TIME\",\n        \"status\": \"ACTIVE\",\n        \"workMode\": \"HYBRID\",\n        \"joinDate\": \"2023-01-15T00:00:00.000Z\",\n        \"baseSalary\": 85000,\n        \"totalSalary\": 85000,\n        \"currency\": \"USD\",\n        \"createdAt\": \"2025-10-16T08:49:30.000Z\",\n        \"updatedAt\": \"2025-10-16T08:49:30.000Z\",\n        \"department\": {\n          \"id\": \"clx9c0df0000000000000100\",\n          \"name\": \"Engineering\",\n          \"code\": \"ENG\"\n        }\n      },\n      {\n        \"id\": \"clx9c0df0000000000000002\",\n        \"firstName\": \"Jane\",\n        \"lastName\": \"Smith\",\n        \"fullName\": \"Jane Smith\",\n        \"email\": \"jane.smith@yazmedia.com\",\n        \"phone\": \"+1987654321\",\n        \"employeeId\": \"EMP002\",\n        \"departmentId\": \"clx9c0df0000000000000101\",\n        \"designation\": \"HR Manager\",\n        \"employmentType\": \"FULL_TIME\",\n        \"status\": \"ACTIVE\",\n        \"workMode\": \"ON_SITE\",\n        \"joinDate\": \"2023-06-01T00:00:00.000Z\",\n        \"baseSalary\": 75000,\n        \"totalSalary\": 75000,\n        \"currency\": \"USD\",\n        \"createdAt\": \"2025-10-16T08:49:30.000Z\",\n        \"updatedAt\": \"2025-10-16T08:49:30.000Z\",\n        \"department\": {\n          \"id\": \"clx9c0df0000000000000101\",\n          \"name\": \"Human Resources\",\n          \"code\": \"HR\"\n        }\n      }\n    ],\n    \"total\": 2,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 1\n  },\n  \"message\": \"Employees retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Employee Profile (All Tabs)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/employees/{{employee_id}}/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees",
+                "{{employee_id}}",
+                "profile"
+              ]
+            },
+            "description": "Get comprehensive employee profile with all 4 tabs (Personal Info, Employment Details, Payment Info, Documents)"
+          },
+          "response": [
+            {
+              "name": "Get Employee Profile Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/employees/{{employee_id}}/profile",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "employees",
+                    "{{employee_id}}",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx9c0df0000000000000001\",\n    \"employeeId\": \"EMP001\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"fullName\": \"John Doe\",\n    \"avatar\": \"JD\",\n    \"personalInfo\": {\n      \"workEmail\": \"john.doe@yazmedia.com\",\n      \"personalEmail\": \"john.doe@personal.com\",\n      \"phone\": \"+1 234 567 8900\",\n      \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n      \"gender\": \"Male\",\n      \"molId\": \"MOL123456\",\n      \"address\": \"123 Main St\",\n      \"city\": \"Dubai\",\n      \"state\": \"Dubai\",\n      \"zipCode\": \"12345\",\n      \"country\": \"UAE\"\n    },\n    \"employmentDetails\": {\n      \"positionInfo\": {\n        \"status\": \"ACTIVE\",\n        \"employmentType\": \"FULL_TIME\",\n        \"department\": {\n          \"id\": \"clx9c0df0000000000000100\",\n          \"name\": \"Engineering\",\n          \"code\": \"ENG\"\n        },\n        \"designation\": \"Software Engineer\",\n        \"joinDate\": \"2023-01-15T00:00:00.000Z\",\n        \"probationPeriod\": \"3 months\",\n        \"confirmationDate\": \"2023-04-15T00:00:00.000Z\",\n        \"contractDuration\": \"Permanent\",\n        \"contractExpiryDate\": null,\n        \"workMode\": \"HYBRID\"\n      },\n      \"lineManager\": {\n        \"id\": \"clx9c0df0000000000000002\",\n        \"name\": \"Sarah Williams\",\n        \"email\": \"sarah.williams@yazmedia.com\",\n        \"phone\": \"+1 234 567 8903\",\n        \"designation\": \"Engineering Manager\"\n      }\n    },\n    \"paymentInfo\": {\n      \"salaryDetails\": {\n        \"baseSalary\": 85000,\n        \"totalSalary\": 85000,\n        \"currency\": \"USD\"\n      },\n      \"bankDetails\": {\n        \"paymentMethod\": \"Bank Transfer\",\n        \"bankName\": \"Emirates NBD\",\n        \"accountHolderName\": \"John Doe\",\n        \"iban\": \"AE070033123456789012345\",\n        \"routingNumber\": \"EBILAEAEAD\"\n      },\n      \"salaryHistory\": [\n        {\n          \"id\": \"payroll_001\",\n          \"month\": 10,\n          \"year\": 2025,\n          \"baseSalary\": 85000,\n          \"allowances\": 5000,\n          \"deductions\": 2000,\n          \"taxDeduction\": 3000,\n          \"netSalary\": 85000,\n          \"status\": \"PAID\",\n          \"paidDate\": \"2025-10-31T00:00:00.000Z\"\n        },\n        {\n          \"id\": \"payroll_002\",\n          \"month\": 9,\n          \"year\": 2025,\n          \"baseSalary\": 85000,\n          \"allowances\": 5000,\n          \"deductions\": 2000,\n          \"taxDeduction\": 3000,\n          \"netSalary\": 85000,\n          \"status\": \"PAID\",\n          \"paidDate\": \"2025-09-30T00:00:00.000Z\"\n        }\n      ]\n    },\n    \"documents\": {\n      \"passportCopy\": {\n        \"id\": \"doc_001\",\n        \"documentType\": \"PASSPORT\",\n        \"name\": \"John_Doe_Passport.pdf\",\n        \"url\": \"https://storage.example.com/documents/passport_001.pdf\",\n        \"uploadedAt\": \"2023-01-10T00:00:00.000Z\"\n      },\n      \"emiratesId\": {\n        \"id\": \"doc_002\",\n        \"documentType\": \"EMIRATES_ID\",\n        \"name\": \"John_Doe_Emirates_ID.pdf\",\n        \"url\": \"https://storage.example.com/documents/emirates_id_001.pdf\",\n        \"uploadedAt\": \"2023-01-10T00:00:00.000Z\"\n      },\n      \"certificates\": [\n        {\n          \"id\": \"doc_003\",\n          \"documentType\": \"CERTIFICATE\",\n          \"name\": \"Bachelor_of_Science_Computer_Science.pdf\",\n          \"url\": \"https://storage.example.com/documents/cert_001.pdf\",\n          \"uploadedAt\": \"2023-01-10T00:00:00.000Z\"\n        }\n      ],\n      \"otherDocuments\": [\n        {\n          \"id\": \"doc_004\",\n          \"documentType\": \"OTHER\",\n          \"name\": \"Employment_Contract.pdf\",\n          \"url\": \"https://storage.example.com/documents/contract_001.pdf\",\n          \"uploadedAt\": \"2023-01-10T00:00:00.000Z\"\n        }\n      ]\n    },\n    \"metadata\": {\n      \"createdAt\": \"2025-10-16T08:49:30.000Z\",\n      \"updatedAt\": \"2025-10-16T10:30:45.000Z\"\n    }\n  },\n  \"message\": \"Employee profile retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@yazmedia.com\",\n  \"password\": \"SecurePassword123!\",\n  \"phone\": \"+1234567890\",\n  \"employeeId\": \"EMP001\",\n  \"departmentId\": \"dept_id_here\",\n  \"designation\": \"Software Engineer\",\n  \"employmentType\": \"FULL_TIME\",\n  \"workMode\": \"HYBRID\",\n  \"joinDate\": \"2023-01-15\",\n  \"baseSalary\": 85000,\n  \"totalSalary\": 85000,\n  \"dateOfBirth\": \"1990-05-20\",\n  \"gender\": \"Male\",\n  \"address\": \"123 Main St\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/employees",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees"
+              ]
+            },
+            "description": "Create new employee (HR/Admin only)"
+          },
+          "response": [
+            {
+              "name": "Create Employee Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@yazmedia.com\",\n  \"password\": \"SecurePassword123!\",\n  \"phone\": \"+1234567890\",\n  \"employeeId\": \"EMP001\",\n  \"departmentId\": \"dept_id_here\",\n  \"designation\": \"Software Engineer\",\n  \"employmentType\": \"FULL_TIME\",\n  \"workMode\": \"HYBRID\",\n  \"joinDate\": \"2023-01-15\",\n  \"baseSalary\": 85000,\n  \"totalSalary\": 85000\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/employees",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx9c0df0000000000000001\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"fullName\": \"John Doe\",\n    \"email\": \"john.doe@yazmedia.com\",\n    \"phone\": \"+1234567890\",\n    \"dateOfBirth\": null,\n    \"gender\": null,\n    \"address\": null,\n    \"city\": null,\n    \"state\": null,\n    \"zipCode\": null,\n    \"country\": null,\n    \"employeeId\": \"EMP001\",\n    \"departmentId\": \"dept_id_here\",\n    \"designation\": \"Software Engineer\",\n    \"employmentType\": \"FULL_TIME\",\n    \"status\": \"ACTIVE\",\n    \"workMode\": \"HYBRID\",\n    \"joinDate\": \"2023-01-15T00:00:00.000Z\",\n    \"terminationDate\": null,\n    \"baseSalary\": 85000,\n    \"totalSalary\": 85000,\n    \"currency\": \"USD\",\n    \"createdAt\": \"2025-10-16T10:45:30.000Z\",\n    \"updatedAt\": \"2025-10-16T10:45:30.000Z\",\n    \"department\": {\n      \"id\": \"dept_id_here\",\n      \"name\": \"Engineering\",\n      \"code\": \"ENG\"\n    }\n  },\n  \"message\": \"Employee created successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"personalInfo\": {\n    \"personalEmail\": \"john.doe@personal.com\",\n    \"phone\": \"+1 234 567 8900\",\n    \"dateOfBirth\": \"1990-05-15\",\n    \"gender\": \"Male\",\n    \"molId\": \"MOL123456\",\n    \"address\": \"123 Main St\",\n    \"city\": \"Dubai\",\n    \"state\": \"Dubai\",\n    \"zipCode\": \"12345\",\n    \"country\": \"UAE\"\n  },\n  \"employmentDetails\": {\n    \"designation\": \"Senior Software Engineer\",\n    \"workMode\": \"REMOTE\",\n    \"probationPeriod\": \"3 months\",\n    \"confirmationDate\": \"2023-04-15\",\n    \"contractDuration\": \"Permanent\",\n    \"contractExpiryDate\": null,\n    \"status\": \"ACTIVE\"\n  },\n  \"paymentInfo\": {\n    \"baseSalary\": 95000,\n    \"totalSalary\": 95000,\n    \"currency\": \"USD\",\n    \"paymentMethod\": \"Bank Transfer\",\n    \"bankName\": \"Emirates NBD\",\n    \"accountHolderName\": \"John Doe\",\n    \"iban\": \"AE070033123456789012345\",\n    \"routingNumber\": \"EBILAEAEAD\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/employees/{{employee_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees",
+                "{{employee_id}}"
+              ]
+            },
+            "description": "Update employee details - all fields are optional. Update personal info, employment details, and payment information (HR/Admin only)"
+          },
+          "response": [
+            {
+              "name": "Update Employee Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"personalInfo\": {\n    \"personalEmail\": \"john.doe@personal.com\",\n    \"phone\": \"+1 234 567 8900\",\n    \"dateOfBirth\": \"1990-05-15\",\n    \"gender\": \"Male\",\n    \"molId\": \"MOL123456\",\n    \"address\": \"123 Main St\",\n    \"city\": \"Dubai\",\n    \"state\": \"Dubai\",\n    \"zipCode\": \"12345\",\n    \"country\": \"UAE\"\n  },\n  \"employmentDetails\": {\n    \"designation\": \"Senior Software Engineer\",\n    \"workMode\": \"REMOTE\",\n    \"probationPeriod\": \"3 months\",\n    \"confirmationDate\": \"2023-04-15\",\n    \"contractDuration\": \"Permanent\",\n    \"contractExpiryDate\": null,\n    \"status\": \"ACTIVE\"\n  },\n  \"paymentInfo\": {\n    \"baseSalary\": 95000,\n    \"totalSalary\": 95000,\n    \"currency\": \"USD\",\n    \"paymentMethod\": \"Bank Transfer\",\n    \"bankName\": \"Emirates NBD\",\n    \"accountHolderName\": \"John Doe\",\n    \"iban\": \"AE070033123456789012345\",\n    \"routingNumber\": \"EBILAEAEAD\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/employees/{{employee_id}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees", "{{employee_id}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx9c0df0000000000000001\",\n    \"userId\": \"clx9c0df0000000000000000\",\n    \"employeeId\": \"EMP001\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"fullName\": \"John Doe\",\n    \"avatar\": \"JD\",\n    \"personalInfo\": {\n      \"workEmail\": \"john.doe@yazmedia.com\",\n      \"personalEmail\": \"john.doe@personal.com\",\n      \"phone\": \"+1 234 567 8900\",\n      \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n      \"gender\": \"Male\",\n      \"molId\": \"MOL123456\",\n      \"address\": \"123 Main St\",\n      \"city\": \"Dubai\",\n      \"state\": \"Dubai\",\n      \"zipCode\": \"12345\",\n      \"country\": \"UAE\"\n    },\n    \"employmentDetails\": {\n      \"positionInfo\": {\n        \"status\": \"ACTIVE\",\n        \"employmentType\": \"FULL_TIME\",\n        \"department\": {\n          \"id\": \"clx9c0df0000000000000100\",\n          \"name\": \"Engineering\",\n          \"code\": \"ENG\"\n        },\n        \"designation\": \"Senior Software Engineer\",\n        \"joinDate\": \"2023-01-15T00:00:00.000Z\",\n        \"probationPeriod\": \"3 months\",\n        \"confirmationDate\": \"2023-04-15T00:00:00.000Z\",\n        \"contractDuration\": \"Permanent\",\n        \"contractExpiryDate\": null,\n        \"workMode\": \"REMOTE\"\n      },\n      \"lineManager\": {\n        \"id\": \"clx9c0df0000000000000002\",\n        \"name\": \"Sarah Williams\",\n        \"email\": \"sarah.williams@yazmedia.com\",\n        \"phone\": \"+1 234 567 8903\",\n        \"designation\": \"Engineering Manager\"\n      }\n    },\n    \"paymentInfo\": {\n      \"salaryDetails\": {\n        \"baseSalary\": 95000,\n        \"totalSalary\": 95000,\n        \"currency\": \"USD\"\n      },\n      \"bankDetails\": {\n        \"paymentMethod\": \"Bank Transfer\",\n        \"bankName\": \"Emirates NBD\",\n        \"accountHolderName\": \"John Doe\",\n        \"iban\": \"AE070033123456789012345\",\n        \"routingNumber\": \"EBILAEAEAD\"\n      }\n    },\n    \"metadata\": {\n      \"createdAt\": \"2025-10-16T08:49:30.000Z\",\n      \"updatedAt\": \"2025-10-16T10:50:15.000Z\"\n    }\n  },\n  \"message\": \"Employee updated successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Employee",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/employees/{{employee_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees",
+                "{{employee_id}}"
+              ]
+            },
+            "description": "Delete employee (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Delete Employee Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/employees/{{employee_id}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees", "{{employee_id}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Employee deleted successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Employees for Management",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/employees/management?page=1&pageSize=10&userStatus=ACTIVE&role=EMPLOYEE&search=",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees",
+                "management"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "userStatus",
+                  "value": "ACTIVE"
+                },
+                {
+                  "key": "role",
+                  "value": "EMPLOYEE",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get all employees for management (view and manage roles/status) - Admin/HR only"
+          },
+          "response": [
+            {
+              "name": "Get All Employees for Management Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/employees/management?page=1&pageSize=10&userStatus=ACTIVE",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees", "management"],
+                  "query": [{"key": "page", "value": "1"}, {"key": "pageSize", "value": "10"}, {"key": "userStatus", "value": "ACTIVE"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"id\": \"clp1a2b3c4d5e6f7g8h9i0j1k\",\n        \"email\": \"john.doe@company.com\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"fullName\": \"John Doe\",\n        \"employeeId\": \"EMP001\",\n        \"role\": \"EMPLOYEE\",\n        \"userStatus\": \"ACTIVE\",\n        \"lastLogin\": \"2025-10-17T10:30:00Z\",\n        \"designation\": \"Software Engineer\",\n        \"department\": {\n          \"id\": \"dept_123\",\n          \"name\": \"Engineering\",\n          \"code\": \"ENG\"\n        },\n        \"createdAt\": \"2023-01-15T10:30:00Z\",\n        \"updatedAt\": \"2023-01-15T10:30:00Z\"\n      },\n      {\n        \"id\": \"clp2b3c4d5e6f7g8h9i0j1k2l\",\n        \"email\": \"jane.smith@company.com\",\n        \"firstName\": \"Jane\",\n        \"lastName\": \"Smith\",\n        \"fullName\": \"Jane Smith\",\n        \"employeeId\": \"EMP002\",\n        \"role\": \"HR\",\n        \"userStatus\": \"ACTIVE\",\n        \"lastLogin\": \"2025-10-16T14:20:00Z\",\n        \"designation\": \"HR Manager\",\n        \"department\": {\n          \"id\": \"dept_456\",\n          \"name\": \"Human Resources\",\n          \"code\": \"HR\"\n        },\n        \"createdAt\": \"2022-08-10T09:15:00Z\",\n        \"updatedAt\": \"2022-08-10T09:15:00Z\"\n      }\n    ],\n    \"total\": 25,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 3\n  },\n  \"message\": \"Employees retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Toggle Employee Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/employees/{{employee_id}}/toggle-status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees",
+                "{{employee_id}}",
+                "toggle-status"
+              ]
+            },
+            "description": "Toggle employee status (ACTIVE <-> INACTIVE) - Admin/HR only"
+          },
+          "response": [
+            {
+              "name": "Toggle to INACTIVE",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/employees/{{employee_id}}/toggle-status",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees", "{{employee_id}}", "toggle-status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clp1a2b3c4d5e6f7g8h9i0j1k\",\n    \"email\": \"john.doe@company.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"fullName\": \"John Doe\",\n    \"employeeId\": \"EMP001\",\n    \"role\": \"EMPLOYEE\",\n    \"userStatus\": \"INACTIVE\",\n    \"designation\": \"Software Engineer\",\n    \"department\": {\n      \"id\": \"dept_123\",\n      \"name\": \"Engineering\",\n      \"code\": \"ENG\"\n    },\n    \"createdAt\": \"2023-01-15T10:30:00Z\",\n    \"updatedAt\": \"2025-10-17T15:45:00Z\"\n  },\n  \"message\": \"Employee status toggled to INACTIVE successfully\"\n}"
+            },
+            {
+              "name": "Toggle to ACTIVE",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/employees/{{employee_id}}/toggle-status",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees", "{{employee_id}}", "toggle-status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clp1a2b3c4d5e6f7g8h9i0j1k\",\n    \"email\": \"john.doe@company.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"fullName\": \"John Doe\",\n    \"employeeId\": \"EMP001\",\n    \"role\": \"EMPLOYEE\",\n    \"userStatus\": \"ACTIVE\",\n    \"designation\": \"Software Engineer\",\n    \"department\": {\n      \"id\": \"dept_123\",\n      \"name\": \"Engineering\",\n      \"code\": \"ENG\"\n    },\n    \"createdAt\": \"2023-01-15T10:30:00Z\",\n    \"updatedAt\": \"2025-10-17T15:45:00Z\"\n  },\n  \"message\": \"Employee status toggled to ACTIVE successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Manage Employee Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"HR\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/employees/{{employee_id}}/role",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "employees",
+                "{{employee_id}}",
+                "role"
+              ]
+            },
+            "description": "Manage employee role (change to EMPLOYEE, HR, FINANCE, or MANAGEMENT) - Admin/HR only"
+          },
+          "response": [
+            {
+              "name": "Manage Employee Role Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"role\": \"HR\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/employees/{{employee_id}}/role",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["employees", "{{employee_id}}", "role"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clp1a2b3c4d5e6f7g8h9i0j1k\",\n    \"email\": \"john.doe@company.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"fullName\": \"John Doe\",\n    \"employeeId\": \"EMP001\",\n    \"role\": \"HR\",\n    \"userStatus\": \"ACTIVE\",\n    \"designation\": \"Software Engineer\",\n    \"department\": {\n      \"id\": \"dept_123\",\n      \"name\": \"Engineering\",\n      \"code\": \"ENG\"\n    },\n    \"createdAt\": \"2023-01-15T10:30:00Z\",\n    \"updatedAt\": \"2025-10-17T16:00:00Z\"\n  },\n  \"message\": \"Employee role changed to HR successfully\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leave Management",
+      "item": [
+        {
+          "name": "Get Leave Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/leave-requests?page=1&pageSize=10&status=PENDING&leaveType=ANNUAL&search=",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "leave-requests"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "disabled": true
+                },
+                {
+                  "key": "leaveType",
+                  "value": "ANNUAL",
+                  "disabled": true
+                },
+                {
+                  "key": "employeeId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get all leave requests with employee information, pagination and filters"
+          },
+          "response": [
+            {
+              "name": "Get Leave Requests Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests"],
+                  "query": [{"key": "page", "value": "1"}, {"key": "pageSize", "value": "10"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"id\": \"clx9c0df0000000000000000\",\n        \"employeeName\": \"John Smith\",\n        \"employeeId\": \"EMP001\",\n        \"leaveType\": \"ANNUAL\",\n        \"absenceCode\": \"AL\",\n        \"startDate\": \"2025-01-15T00:00:00.000Z\",\n        \"endDate\": \"2025-01-19T00:00:00.000Z\",\n        \"totalDays\": 5,\n        \"details\": \"Family vacation\",\n        \"status\": \"PENDING\",\n        \"createdDate\": \"2025-01-10T10:30:45.000Z\",\n        \"approvedBy\": null,\n        \"approvalDate\": null,\n        \"rejectionReason\": null,\n        \"userId\": \"clx9c0df0000000000000100\",\n        \"documents\": [\n          {\n            \"id\": \"doc_001\",\n            \"fileName\": \"flight_booking_confirmation.pdf\",\n            \"fileType\": \"application/pdf\",\n            \"url\": \"https://storage.example.com/documents/flight_booking_confirmation_001.pdf\",\n            \"uploadDate\": \"2025-01-10T11:00:00.000Z\"\n          },\n          {\n            \"id\": \"doc_002\",\n            \"fileName\": \"hotel_reservation.pdf\",\n            \"fileType\": \"application/pdf\",\n            \"url\": \"https://storage.example.com/documents/hotel_reservation_001.pdf\",\n            \"uploadDate\": \"2025-01-10T11:05:00.000Z\"\n          }\n        ]\n      },\n      {\n        \"id\": \"clx9c0df0000000000000001\",\n        \"employeeName\": \"Sarah Johnson\",\n        \"employeeId\": \"EMP002\",\n        \"leaveType\": \"SICK\",\n        \"absenceCode\": \"SL\",\n        \"startDate\": \"2025-01-12T00:00:00.000Z\",\n        \"endDate\": \"2025-01-13T00:00:00.000Z\",\n        \"totalDays\": 2,\n        \"details\": \"Medical appointment\",\n        \"status\": \"APPROVED\",\n        \"createdDate\": \"2025-01-08T10:30:45.000Z\",\n        \"approvedBy\": \"clx9c0df0000000000000200\",\n        \"approvalDate\": \"2025-01-08T14:30:45.000Z\",\n        \"rejectionReason\": null,\n        \"userId\": \"clx9c0df0000000000000101\"\n      },\n      {\n        \"id\": \"clx9c0df0000000000000002\",\n        \"employeeName\": \"Michael Brown\",\n        \"employeeId\": \"EMP003\",\n        \"leaveType\": \"PERSONAL\",\n        \"absenceCode\": \"PL\",\n        \"startDate\": \"2025-01-20T00:00:00.000Z\",\n        \"endDate\": \"2025-01-20T00:00:00.000Z\",\n        \"totalDays\": 1,\n        \"details\": \"Personal matter\",\n        \"status\": \"REJECTED\",\n        \"createdDate\": \"2025-01-09T10:30:45.000Z\",\n        \"approvedBy\": null,\n        \"approvalDate\": null,\n        \"rejectionReason\": \"Insufficient notice\",\n        \"userId\": \"clx9c0df0000000000000102\"\n      }\n    ],\n    \"total\": 3,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 1\n  },\n  \"message\": \"Leave requests retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Leave Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approvalNotes\": \"Approved - enjoy your vacation!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/leave-requests/{{leave_request_id}}/approve",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["leave-requests", "{{leave_request_id}}", "approve"]
+            },
+            "description": "Approve a pending leave request (HR/Admin only)"
+          },
+          "response": [
+            {
+              "name": "Approve Leave Request Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"approvalNotes\": \"Approved - enjoy your vacation!\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests/clx9c0df0000000000000000/approve",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests", "clx9c0df0000000000000000", "approve"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx9c0df0000000000000000\",\n    \"employeeName\": \"John Smith\",\n    \"employeeId\": \"EMP001\",\n    \"leaveType\": \"ANNUAL\",\n    \"absenceCode\": \"AL\",\n    \"startDate\": \"2025-01-15T00:00:00.000Z\",\n    \"endDate\": \"2025-01-19T00:00:00.000Z\",\n    \"totalDays\": 5,\n    \"details\": \"Family vacation\",\n    \"status\": \"APPROVED\",\n    \"createdDate\": \"2025-01-10T10:30:45.000Z\",\n    \"approvedBy\": \"clx9c0df0000000000000200\",\n    \"approvalDate\": \"2025-01-10T14:30:45.000Z\",\n    \"rejectionReason\": null,\n    \"approvalNotes\": \"Approved - enjoy your vacation!\"\n  },\n  \"message\": \"Leave request approved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reject Leave Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Insufficient documentation provided\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/leave-requests/{{leave_request_id}}/reject",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["leave-requests", "{{leave_request_id}}", "reject"]
+            },
+            "description": "Reject a pending leave request with reason (HR/Admin only)"
+          },
+          "response": [
+            {
+              "name": "Reject Leave Request Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rejectionReason\": \"Insufficient documentation provided\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests/clx9c0df0000000000000002/reject",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests", "clx9c0df0000000000000002", "reject"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clx9c0df0000000000000002\",\n    \"employeeName\": \"Michael Brown\",\n    \"employeeId\": \"EMP003\",\n    \"leaveType\": \"PERSONAL\",\n    \"absenceCode\": \"PL\",\n    \"startDate\": \"2025-01-20T00:00:00.000Z\",\n    \"endDate\": \"2025-01-20T00:00:00.000Z\",\n    \"totalDays\": 1,\n    \"details\": \"Personal matter\",\n    \"status\": \"REJECTED\",\n    \"createdDate\": \"2025-01-09T10:30:45.000Z\",\n    \"approvedBy\": \"clx9c0df0000000000000200\",\n    \"approvalDate\": \"2025-01-09T14:30:45.000Z\",\n    \"rejectionReason\": \"Insufficient documentation provided\"\n  },\n  \"message\": \"Leave request rejected successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Yearly Management",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/leave-requests/yearly?page=1&pageSize=10&status=ACTIVE&year=2025&search=",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "leave-requests",
+                "yearly"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "disabled": true
+                },
+                {
+                  "key": "year",
+                  "value": "2025",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get yearly management data for all employees with annual leave, carried over, sick leave, WFH days, and unpaid status"
+          },
+          "response": [
+            {
+              "name": "Get Yearly Management Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests/yearly?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests", "yearly"],
+                  "query": [{"key": "page", "value": "1"}, {"key": "pageSize", "value": "10"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"employeeName\": \"John Smith\",\n        \"employeeId\": \"EMP001\",\n        \"annualLeave\": {\n          \"remaining\": 15,\n          \"used\": 10,\n          \"total\": 25,\n          \"display\": \"15 remaining\\n10/25 used\"\n        },\n        \"carriedOver\": 3,\n        \"sickLeave\": {\n          \"remaining\": 7,\n          \"used\": 3,\n          \"total\": 10,\n          \"display\": \"7 remaining\\n3/10 used\"\n        },\n        \"wfhDays\": {\n          \"remaining\": 8,\n          \"used\": 12,\n          \"total\": 20,\n          \"display\": \"8 remaining\\n12/20 used\"\n        },\n        \"unpaid\": \"-\",\n        \"status\": \"ACTIVE\",\n        \"year\": 2025\n      },\n      {\n        \"employeeName\": \"Sarah Johnson\",\n        \"employeeId\": \"EMP002\",\n        \"annualLeave\": {\n          \"remaining\": 17,\n          \"used\": 8,\n          \"total\": 25,\n          \"display\": \"17 remaining\\n8/25 used\"\n        },\n        \"carriedOver\": 5,\n        \"sickLeave\": {\n          \"remaining\": 8,\n          \"used\": 2,\n          \"total\": 10,\n          \"display\": \"8 remaining\\n2/10 used\"\n        },\n        \"wfhDays\": {\n          \"remaining\": 5,\n          \"used\": 15,\n          \"total\": 20,\n          \"display\": \"5 remaining\\n15/20 used\"\n        },\n        \"unpaid\": 2,\n        \"status\": \"ACTIVE\",\n        \"year\": 2025\n      },\n      {\n        \"employeeName\": \"Michael Brown\",\n        \"employeeId\": \"EMP003\",\n        \"annualLeave\": {\n          \"remaining\": 10,\n          \"used\": 15,\n          \"total\": 25,\n          \"display\": \"10 remaining\\n15/25 used\"\n        },\n        \"carriedOver\": 0,\n        \"sickLeave\": {\n          \"remaining\": 5,\n          \"used\": 5,\n          \"total\": 10,\n          \"display\": \"5 remaining\\n5/10 used\"\n        },\n        \"wfhDays\": {\n          \"remaining\": 12,\n          \"used\": 8,\n          \"total\": 20,\n          \"display\": \"12 remaining\\n8/20 used\"\n        },\n        \"unpaid\": 1,\n        \"status\": \"ACTIVE\",\n        \"year\": 2025\n      }\n    ],\n    \"total\": 3,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 1\n  },\n  \"message\": \"Yearly management data retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Holiday Management",
+          "item": [
+            {
+              "name": "Get Holiday Types",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/holidays/types",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["holidays", "types"]
+                },
+                "description": "Get all available holiday types"
+              },
+              "response": [
+                {
+                  "name": "Get Holiday Types Success",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                    "url": {
+                      "raw": "http://localhost:3000/holidays/types",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["holidays", "types"]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"type1\",\n      \"name\": \"Public Holiday\",\n      \"description\": \"National public holidays\",\n      \"type\": \"PUBLIC_HOLIDAY\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    },\n    {\n      \"id\": \"type2\",\n      \"name\": \"Company Holiday\",\n      \"description\": \"Company-specific holidays\",\n      \"type\": \"COMPANY_HOLIDAY\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    }\n  ],\n  \"message\": \"Holiday types retrieved successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get All Holidays",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/holidays?page=1&pageSize=10&type=PUBLIC_HOLIDAY&search=",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["holidays"],
+                  "query": [
+                    {"key": "page", "value": "1"},
+                    {"key": "pageSize", "value": "10"},
+                    {"key": "type", "value": "PUBLIC_HOLIDAY", "disabled": true},
+                    {"key": "search", "value": ""}
+                  ]
+                },
+                "description": "Get all holidays with pagination and filters"
+              },
+              "response": [
+                {
+                  "name": "Get Holidays Success",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                    "url": {
+                      "raw": "http://localhost:3000/holidays?page=1&pageSize=10",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["holidays"],
+                      "query": [{"key": "page", "value": "1"}, {"key": "pageSize", "value": "10"}]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"id\": \"holiday1\",\n        \"name\": \"New Year's Day\",\n        \"description\": \"First day of the year\",\n        \"startDate\": \"2025-01-01T00:00:00.000Z\",\n        \"endDate\": \"2025-01-01T00:00:00.000Z\",\n        \"type\": \"PUBLIC_HOLIDAY\",\n        \"typeName\": \"Public Holiday\",\n        \"duration\": 1,\n        \"createdAt\": \"2025-01-01T00:00:00.000Z\"\n      },\n      {\n        \"id\": \"holiday2\",\n        \"name\": \"Christmas Day\",\n        \"description\": \"Christmas celebration\",\n        \"startDate\": \"2025-12-25T00:00:00.000Z\",\n        \"endDate\": \"2025-12-25T00:00:00.000Z\",\n        \"type\": \"PUBLIC_HOLIDAY\",\n        \"typeName\": \"Public Holiday\",\n        \"duration\": 1,\n        \"createdAt\": \"2025-01-01T00:00:00.000Z\"\n      }\n    ],\n    \"total\": 2,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 1\n  },\n  \"message\": \"Holidays retrieved successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Create Holiday",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"New Year's Day\",\n  \"description\": \"First day of the year\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-01-01\",\n  \"holidayTypeId\": \"type1\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/holidays",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["holidays"]
+                },
+                "description": "Create a new holiday"
+              },
+              "response": [
+                {
+                  "name": "Create Holiday Success",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {"key": "Authorization", "value": "Bearer {{token}}"},
+                      {"key": "Content-Type", "value": "application/json"}
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"New Year's Day\",\n  \"description\": \"First day of the year\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-01-01\",\n  \"holidayTypeId\": \"type1\"\n}"
+                    },
+                    "url": {
+                      "raw": "http://localhost:3000/holidays",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["holidays"]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"holiday1\",\n    \"name\": \"New Year's Day\",\n    \"description\": \"First day of the year\",\n    \"startDate\": \"2025-01-01T00:00:00.000Z\",\n    \"endDate\": \"2025-01-01T00:00:00.000Z\",\n    \"type\": \"PUBLIC_HOLIDAY\",\n    \"typeName\": \"Public Holiday\",\n    \"duration\": 1\n  },\n  \"message\": \"Holiday created successfully\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Calendar View",
+          "item": [
+            {
+              "name": "Get Leave Type Colors",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/calendar/leave-type-colors",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["calendar", "leave-type-colors"]
+                },
+                "description": "Get all leave type colors with shortcuts"
+              },
+              "response": [
+                {
+                  "name": "Get Leave Type Colors Success",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                    "url": {
+                      "raw": "http://localhost:3000/calendar/leave-type-colors",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["calendar", "leave-type-colors"]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"color1\",\n      \"leaveType\": \"ANNUAL\",\n      \"name\": \"Vacation leave\",\n      \"hexColor\": \"#C8E6C9\",\n      \"shortcut\": \"V\",\n      \"description\": \"Annual vacation leave\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    },\n    {\n      \"id\": \"color2\",\n      \"leaveType\": \"SICK\",\n      \"name\": \"Sickness leave\",\n      \"hexColor\": \"#FFCCCC\",\n      \"shortcut\": \"S\",\n      \"description\": \"Sick leave\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    },\n    {\n      \"id\": \"color3\",\n      \"leaveType\": \"MATERNITY\",\n      \"name\": \"Maternity\",\n      \"hexColor\": \"#B3E5FC\",\n      \"shortcut\": \"M\",\n      \"description\": \"Maternity leave\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    },\n    {\n      \"id\": \"color4\",\n      \"leaveType\": \"EMERGENCY\",\n      \"name\": \"Emergency Leave\",\n      \"hexColor\": \"#F8BBD0\",\n      \"shortcut\": \"E\",\n      \"description\": \"Emergency leave\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    },\n    {\n      \"id\": \"color5\",\n      \"leaveType\": \"TOIL\",\n      \"name\": \"TOIL\",\n      \"hexColor\": \"#FFF9C4\",\n      \"shortcut\": \"T\",\n      \"description\": \"Time off in lieu\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    },\n    {\n      \"id\": \"color6\",\n      \"leaveType\": \"WFH\",\n      \"name\": \"Work From Home\",\n      \"hexColor\": \"#E1BEE7\",\n      \"shortcut\": \"W\",\n      \"description\": \"Work from home\",\n      \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n    }\n  ],\n  \"message\": \"Leave type colors retrieved successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get Calendar View",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/calendar/view?month=10&year=2025&departmentId=&search=",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["calendar", "view"],
+                  "query": [
+                    {"key": "month", "value": "10"},
+                    {"key": "year", "value": "2025"},
+                    {"key": "departmentId", "value": "", "disabled": true},
+                    {"key": "search", "value": ""}
+                  ]
+                },
+                "description": "Get calendar view for employees with leave and holiday information"
+              },
+              "response": [
+                {
+                  "name": "Get Calendar View Success",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                    "url": {
+                      "raw": "http://localhost:3000/calendar/view?month=10&year=2025",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["calendar", "view"],
+                      "query": [{"key": "month", "value": "10"}, {"key": "year", "value": "2025"}]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"month\": 10,\n    \"year\": 2025,\n    \"monthName\": \"October\",\n    \"employees\": [\n      {\n        \"employeeName\": \"John Smith\",\n        \"employeeId\": \"EMP001\",\n        \"userId\": \"user1\",\n        \"status\": \"ACTIVE\",\n        \"days\": [\n          {\"day\": 1, \"dayOfWeek\": \"Wed\", \"status\": \"-\", \"shortcut\": \"-\", \"hexColor\": \"#FFFFFF\", \"leaveType\": null, \"leaveTypeName\": null},\n          {\"day\": 2, \"dayOfWeek\": \"Thu\", \"status\": \"-\", \"shortcut\": \"-\", \"hexColor\": \"#FFFFFF\", \"leaveType\": null, \"leaveTypeName\": null},\n          {\"day\": 5, \"dayOfWeek\": \"Sun\", \"status\": \"LEAVE\", \"shortcut\": \"W\", \"hexColor\": \"#E1BEE7\", \"leaveType\": \"WFH\", \"leaveTypeName\": \"Work From Home\"},\n          {\"day\": 6, \"dayOfWeek\": \"Mon\", \"status\": \"LEAVE\", \"shortcut\": \"W\", \"hexColor\": \"#E1BEE7\", \"leaveType\": \"WFH\", \"leaveTypeName\": \"Work From Home\"}\n        ]\n      },\n      {\n        \"employeeName\": \"Sarah Johnson\",\n        \"employeeId\": \"EMP002\",\n        \"userId\": \"user2\",\n        \"status\": \"ACTIVE\",\n        \"days\": [\n          {\"day\": 1, \"dayOfWeek\": \"Wed\", \"status\": \"-\", \"shortcut\": \"-\", \"hexColor\": \"#FFFFFF\", \"leaveType\": null, \"leaveTypeName\": null},\n          {\"day\": 5, \"dayOfWeek\": \"Sun\", \"status\": \"LEAVE\", \"shortcut\": \"W\", \"hexColor\": \"#E1BEE7\", \"leaveType\": \"WFH\", \"leaveTypeName\": \"Work From Home\"},\n          {\"day\": 9, \"dayOfWeek\": \"Thu\", \"status\": \"LEAVE\", \"shortcut\": \"S\", \"hexColor\": \"#FFCCCC\", \"leaveType\": \"SICK\", \"leaveTypeName\": \"Sickness leave\"}\n        ]\n      }\n    ],\n    \"leaveTypeColors\": [\n      {\"id\": \"color1\", \"leaveType\": \"ANNUAL\", \"name\": \"Vacation leave\", \"hexColor\": \"#C8E6C9\", \"shortcut\": \"V\"},\n      {\"id\": \"color2\", \"leaveType\": \"SICK\", \"name\": \"Sickness leave\", \"hexColor\": \"#FFCCCC\", \"shortcut\": \"S\"},\n      {\"id\": \"color3\", \"leaveType\": \"EMERGENCY\", \"name\": \"Emergency Leave\", \"hexColor\": \"#F8BBD0\", \"shortcut\": \"E\"}\n    ]\n  },\n  \"message\": \"Calendar view retrieved successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Create/Update Leave Type Color",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leaveType\": \"ANNUAL\",\n  \"name\": \"Vacation leave\",\n  \"hexColor\": \"#C8E6C9\",\n  \"shortcut\": \"V\",\n  \"description\": \"Annual vacation leave\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/calendar/leave-type-colors",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["calendar", "leave-type-colors"]
+                },
+                "description": "Create or update leave type color"
+              },
+              "response": [
+                {
+                  "name": "Create Leave Type Color Success",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {"key": "Authorization", "value": "Bearer {{token}}"},
+                      {"key": "Content-Type", "value": "application/json"}
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"leaveType\": \"ANNUAL\",\n  \"name\": \"Vacation leave\",\n  \"hexColor\": \"#C8E6C9\",\n  \"shortcut\": \"V\",\n  \"description\": \"Annual vacation leave\"\n}"
+                    },
+                    "url": {
+                      "raw": "http://localhost:3000/calendar/leave-type-colors",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["calendar", "leave-type-colors"]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"color1\",\n    \"leaveType\": \"ANNUAL\",\n    \"name\": \"Vacation leave\",\n    \"hexColor\": \"#C8E6C9\",\n    \"shortcut\": \"V\",\n    \"description\": \"Annual vacation leave\",\n    \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n  },\n  \"message\": \"Leave type color created successfully\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Get Leave Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/leave-requests/summary?page=1&pageSize=10&status=ACTIVE&year=2025&search=",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "leave-requests",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "disabled": true
+                },
+                {
+                  "key": "year",
+                  "value": "2025",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get leave summary for all employees with leave allowance and usage"
+          },
+          "response": [
+            {
+              "name": "Get Leave Summary Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests/summary?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests", "summary"],
+                  "query": [{"key": "page", "value": "1"}, {"key": "pageSize", "value": "10"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"employeeName\": \"John Smith\",\n        \"employeeId\": \"EMP001\",\n        \"status\": \"ACTIVE\",\n        \"annualLeaveTaken\": 10,\n        \"annualLeaveAllowance\": 25,\n        \"annualLeaveRemaining\": 15,\n        \"sickLeaveTaken\": 3,\n        \"sickLeaveAllowance\": 25,\n        \"sickLeaveRemaining\": 22,\n        \"maternityLeaveTaken\": 0,\n        \"maternityLeaveAllowance\": 25,\n        \"maternityLeaveRemaining\": 25,\n        \"emergencyLeaveTaken\": 1,\n        \"emergencyLeaveAllowance\": 25,\n        \"emergencyLeaveRemaining\": 24,\n        \"toilLeaveTaken\": 0,\n        \"toilLeaveAllowance\": 25,\n        \"toilLeaveRemaining\": 25,\n        \"wfhLeaveTaken\": 8,\n        \"wfhLeaveAllowance\": 25,\n        \"wfhLeaveRemaining\": 17,\n        \"totalLeaveTaken\": 22,\n        \"totalLeaveAllowance\": 150,\n        \"totalLeaveRemaining\": 128,\n        \"year\": 2025\n      },\n      {\n        \"employeeName\": \"Sarah Johnson\",\n        \"employeeId\": \"EMP002\",\n        \"status\": \"ACTIVE\",\n        \"annualLeaveTaken\": 8,\n        \"annualLeaveAllowance\": 25,\n        \"annualLeaveRemaining\": 17,\n        \"sickLeaveTaken\": 2,\n        \"sickLeaveAllowance\": 25,\n        \"sickLeaveRemaining\": 23,\n        \"maternityLeaveTaken\": 0,\n        \"maternityLeaveAllowance\": 25,\n        \"maternityLeaveRemaining\": 25,\n        \"emergencyLeaveTaken\": 0,\n        \"emergencyLeaveAllowance\": 25,\n        \"emergencyLeaveRemaining\": 25,\n        \"toilLeaveTaken\": 0,\n        \"toilLeaveAllowance\": 25,\n        \"toilLeaveRemaining\": 25,\n        \"wfhLeaveTaken\": 12,\n        \"wfhLeaveAllowance\": 25,\n        \"wfhLeaveRemaining\": 13,\n        \"totalLeaveTaken\": 22,\n        \"totalLeaveAllowance\": 150,\n        \"totalLeaveRemaining\": 128,\n        \"year\": 2025\n      }\n    ],\n    \"total\": 2,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 1\n  },\n  \"message\": \"Leave summary retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Document Management",
+          "item": [
+            {
+              "name": "Upload Document",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fileName\": \"medical_certificate.pdf\",\n  \"fileType\": \"application/pdf\",\n  \"url\": \"https://storage.example.com/documents/medical_certificate_12345.pdf\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests/{{leave_request_id}}/documents",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests", "{{leave_request_id}}", "documents"]
+                },
+                "description": "Upload a document for a leave request"
+              },
+              "response": [
+                {
+                  "name": "Upload Document Success",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {"key": "Authorization", "value": "Bearer {{token}}"},
+                      {"key": "Content-Type", "value": "application/json"}
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"fileName\": \"medical_certificate.pdf\",\n  \"fileType\": \"application/pdf\",\n  \"url\": \"https://storage.example.com/documents/medical_certificate_12345.pdf\"\n}"
+                    },
+                    "url": {
+                      "raw": "http://localhost:3000/leave-requests/clx9c0df0000000000000001/documents",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["leave-requests", "clx9c0df0000000000000001", "documents"]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"doc_003\",\n    \"leaveRequestId\": \"clx9c0df0000000000000001\",\n    \"fileName\": \"medical_certificate.pdf\",\n    \"fileType\": \"application/pdf\",\n    \"url\": \"https://storage.example.com/documents/medical_certificate_12345.pdf\",\n    \"uploadDate\": \"2025-01-10T12:00:00.000Z\",\n    \"createdAt\": \"2025-01-10T12:00:00.000Z\"\n  },\n  \"message\": \"Document uploaded successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get Leave Request Documents",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests/{{leave_request_id}}/documents",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests", "{{leave_request_id}}", "documents"]
+                },
+                "description": "Get all documents for a specific leave request"
+              },
+              "response": [
+                {
+                  "name": "Get Documents Success",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                    "url": {
+                      "raw": "http://localhost:3000/leave-requests/clx9c0df0000000000000001/documents",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["leave-requests", "clx9c0df0000000000000001", "documents"]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"doc_003\",\n      \"fileName\": \"medical_certificate.pdf\",\n      \"fileType\": \"application/pdf\",\n      \"url\": \"https://storage.example.com/documents/medical_certificate_12345.pdf\",\n      \"uploadDate\": \"2025-01-10T12:00:00.000Z\"\n    },\n    {\n      \"id\": \"doc_004\",\n      \"fileName\": \"doctor_prescription.jpg\",\n      \"fileType\": \"image/jpeg\",\n      \"url\": \"https://storage.example.com/documents/doctor_prescription_12345.jpg\",\n      \"uploadDate\": \"2025-01-10T12:05:00.000Z\"\n    }\n  ],\n  \"message\": \"Documents retrieved successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Delete Document",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/leave-requests/documents/{{document_id}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["leave-requests", "documents", "{{document_id}}"]
+                },
+                "description": "Delete a document from a leave request"
+              },
+              "response": [
+                {
+                  "name": "Delete Document Success",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                    "url": {
+                      "raw": "http://localhost:3000/leave-requests/documents/doc_003",
+                      "protocol": "http",
+                      "host": ["localhost"],
+                      "port": "3000",
+                      "path": ["leave-requests", "documents", "doc_003"]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "header": [{"key": "Content-Type", "value": "application/json"}],
+                  "body": "{\n  \"success\": true,\n  \"data\": null,\n  \"message\": \"Document deleted successfully\"\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Check if server is running"
+      },
+      "response": [
+        {
+          "name": "Health Check Success",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["health"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": "{\n  \"status\": \"OK\",\n  \"timestamp\": \"2025-10-16T10:55:30.123Z\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "API Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api"
+          ]
+        },
+        "description": "Get API version and info"
+      },
+      "response": [
+        {
+          "name": "API Info Success",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": "{\n  \"message\": \"YAZ Media Dashboard API v1.0\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Announcements",
+      "item": [
+        {
+          "name": "Get All Announcements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/announcements?page=1&pageSize=10&status=PUBLISHED&priority=HIGH&search=",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "announcements"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "PUBLISHED",
+                  "disabled": true
+                },
+                {
+                  "key": "priority",
+                  "value": "HIGH",
+                  "disabled": true
+                },
+                {
+                  "key": "departmentId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get all announcements with pagination and filters (status, priority, department, search)"
+          },
+          "response": [
+            {
+              "name": "Get All Announcements Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/announcements?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["announcements"],
+                  "query": [{"key": "page", "value": "1"}, {"key": "pageSize", "value": "10"}]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"id\": \"clz1a2b3c4d5e6f7g8h9i0j1\",\n        \"title\": \"Company Holiday - January 26\",\n        \"content\": \"Office will be closed for Republic Day. Enjoy the long weekend!\",\n        \"priority\": \"HIGH\",\n        \"status\": \"PUBLISHED\",\n        \"publishedAt\": \"2025-01-08T10:00:00Z\",\n        \"createdAt\": \"2025-01-08T09:00:00Z\",\n        \"updatedAt\": \"2025-01-08T10:00:00Z\",\n        \"creator\": {\n          \"id\": \"user123\",\n          \"firstName\": \"John\",\n          \"lastName\": \"Smith\",\n          \"email\": \"john@example.com\"\n        },\n        \"targetDepartments\": [\n          {\n            \"id\": \"dept_assoc_1\",\n            \"department\": {\n              \"id\": \"dept_all\",\n              \"name\": \"All Employees\"\n            }\n          }\n        ]\n      },\n      {\n        \"id\": \"clz1a2b3c4d5e6f7g8h9i0j2\",\n        \"title\": \"New Office Policy\",\n        \"content\": \"Starting next month, all employees must follow the new work-from-home policy.\",\n        \"priority\": \"MEDIUM\",\n        \"status\": \"PUBLISHED\",\n        \"publishedAt\": \"2025-01-07T14:30:00Z\",\n        \"createdAt\": \"2025-01-07T13:00:00Z\",\n        \"updatedAt\": \"2025-01-07T14:30:00Z\",\n        \"creator\": {\n          \"id\": \"user456\",\n          \"firstName\": \"Jane\",\n          \"lastName\": \"Doe\",\n          \"email\": \"jane@example.com\"\n        },\n        \"targetDepartments\": [\n          {\n            \"id\": \"dept_assoc_2\",\n            \"department\": {\n              \"id\": \"dept_eng\",\n              \"name\": \"Engineering\"\n            }\n          },\n          {\n            \"id\": \"dept_assoc_3\",\n            \"department\": {\n              \"id\": \"dept_hr\",\n              \"name\": \"Human Resources\"\n            }\n          }\n        ]\n      }\n    ],\n    \"total\": 2,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 1\n  },\n  \"message\": \"Announcements retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Announcement by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/announcements/{{announcement_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "announcements",
+                "{{announcement_id}}"
+              ]
+            },
+            "description": "Get single announcement by ID"
+          },
+          "response": [
+            {
+              "name": "Get Announcement Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/announcements/{{announcement_id}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["announcements", "{{announcement_id}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clz1a2b3c4d5e6f7g8h9i0j1\",\n    \"title\": \"Company Holiday - January 26\",\n    \"content\": \"Office will be closed for Republic Day. Enjoy the long weekend!\",\n    \"priority\": \"HIGH\",\n    \"status\": \"PUBLISHED\",\n    \"publishedAt\": \"2025-01-08T10:00:00Z\",\n    \"createdAt\": \"2025-01-08T09:00:00Z\",\n    \"updatedAt\": \"2025-01-08T10:00:00Z\",\n    \"creator\": {\n      \"id\": \"user123\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"email\": \"john@example.com\"\n    },\n    \"targetDepartments\": [\n      {\n        \"id\": \"dept_assoc_1\",\n        \"department\": {\n          \"id\": \"dept_all\",\n          \"name\": \"All Employees\"\n        }\n      }\n    ]\n  },\n  \"message\": \"Announcement retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Company Holiday - January 26\",\n  \"content\": \"Office will be closed for Republic Day. Enjoy the long weekend!\",\n  \"priority\": \"HIGH\",\n  \"departmentIds\": [\"dept_all_employees\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/announcements",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "announcements"
+              ]
+            },
+            "description": "Create new announcement (DRAFT status by default)"
+          },
+          "response": [
+            {
+              "name": "Create Announcement Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Company Holiday - January 26\",\n  \"content\": \"Office will be closed for Republic Day. Enjoy the long weekend!\",\n  \"priority\": \"HIGH\",\n  \"departmentIds\": [\"dept_all_employees\"]\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/announcements",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["announcements"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clz1a2b3c4d5e6f7g8h9i0j1\",\n    \"title\": \"Company Holiday - January 26\",\n    \"content\": \"Office will be closed for Republic Day. Enjoy the long weekend!\",\n    \"priority\": \"HIGH\",\n    \"status\": \"DRAFT\",\n    \"publishedAt\": null,\n    \"createdAt\": \"2025-01-08T09:00:00Z\",\n    \"updatedAt\": \"2025-01-08T09:00:00Z\",\n    \"creator\": {\n      \"id\": \"user123\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"email\": \"john@example.com\"\n    },\n    \"targetDepartments\": [\n      {\n        \"id\": \"dept_assoc_1\",\n        \"department\": {\n          \"id\": \"dept_all\",\n          \"name\": \"All Employees\"\n        }\n      }\n    ]\n  },\n  \"message\": \"Announcement created successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Announcement",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content\",\n  \"priority\": \"MEDIUM\",\n  \"departmentIds\": [\"dept_eng\", \"dept_hr\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/announcements/{{announcement_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "announcements",
+                "{{announcement_id}}"
+              ]
+            },
+            "description": "Update announcement details (all fields optional)"
+          },
+          "response": [
+            {
+              "name": "Update Announcement Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content\",\n  \"priority\": \"MEDIUM\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/announcements/{{announcement_id}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["announcements", "{{announcement_id}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clz1a2b3c4d5e6f7g8h9i0j1\",\n    \"title\": \"Updated Title\",\n    \"content\": \"Updated content\",\n    \"priority\": \"MEDIUM\",\n    \"status\": \"DRAFT\",\n    \"publishedAt\": null,\n    \"createdAt\": \"2025-01-08T09:00:00Z\",\n    \"updatedAt\": \"2025-01-08T11:30:00Z\",\n    \"creator\": {\n      \"id\": \"user123\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"email\": \"john@example.com\"\n    },\n    \"targetDepartments\": [\n      {\n        \"id\": \"dept_assoc_2\",\n        \"department\": {\n          \"id\": \"dept_eng\",\n          \"name\": \"Engineering\"\n        }\n      },\n      {\n        \"id\": \"dept_assoc_3\",\n        \"department\": {\n          \"id\": \"dept_hr\",\n          \"name\": \"Human Resources\"\n        }\n      }\n    ]\n  },\n  \"message\": \"Announcement updated successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Publish Announcement",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/announcements/{{announcement_id}}/publish",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "announcements",
+                "{{announcement_id}}",
+                "publish"
+              ]
+            },
+            "description": "Publish announcement (change status from DRAFT to PUBLISHED)"
+          },
+          "response": [
+            {
+              "name": "Publish Announcement Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/announcements/{{announcement_id}}/publish",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["announcements", "{{announcement_id}}", "publish"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clz1a2b3c4d5e6f7g8h9i0j1\",\n    \"title\": \"Company Holiday - January 26\",\n    \"content\": \"Office will be closed for Republic Day. Enjoy the long weekend!\",\n    \"priority\": \"HIGH\",\n    \"status\": \"PUBLISHED\",\n    \"publishedAt\": \"2025-01-08T10:00:00Z\",\n    \"createdAt\": \"2025-01-08T09:00:00Z\",\n    \"updatedAt\": \"2025-01-08T10:00:00Z\",\n    \"creator\": {\n      \"id\": \"user123\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Smith\",\n      \"email\": \"john@example.com\"\n    },\n    \"targetDepartments\": [\n      {\n        \"id\": \"dept_assoc_1\",\n        \"department\": {\n          \"id\": \"dept_all\",\n          \"name\": \"All Employees\"\n        }\n      }\n    ]\n  },\n  \"message\": \"Announcement published successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Announcement",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/announcements/{{announcement_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "announcements",
+                "{{announcement_id}}"
+              ]
+            },
+            "description": "Delete announcement (Admin/HR only)"
+          },
+          "response": [
+            {
+              "name": "Delete Announcement Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/announcements/{{announcement_id}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["announcements", "{{announcement_id}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Announcement deleted successfully\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Assets",
+      "item": [
+        {
+          "name": "Get All Assets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/assets?page=1&pageSize=10&status=&category=&assetType=&manufacturer=&search=",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["assets"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "pageSize", "value": "10"},
+                {"key": "status", "value": "", "disabled": true},
+                {"key": "category", "value": "", "disabled": true},
+                {"key": "assetType", "value": "", "disabled": true},
+                {"key": "manufacturer", "value": "", "disabled": true},
+                {"key": "search", "value": "", "disabled": true}
+              ]
+            },
+            "description": "Get all assets with pagination and filtering"
+          },
+          "response": [
+            {
+              "name": "Get All Assets Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/assets?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["assets"],
+                  "query": [
+                    {"key": "page", "value": "1"},
+                    {"key": "pageSize", "value": "10"}
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": [\n      {\n        \"id\": \"asset_001\",\n        \"assetName\": \"MacBook Pro 16\\\"\",\n        \"assetType\": \"MAIN_ASSET\",\n        \"category\": \"LAPTOP\",\n        \"serialNumber\": \"MBP123456\",\n        \"manufacturer\": \"Apple\",\n        \"purchaseDate\": \"2024-01-15T00:00:00Z\",\n        \"purchaseCost\": 2500,\n        \"description\": \"High-performance laptop\",\n        \"warrantyExpiration\": \"2026-01-15T00:00:00Z\",\n        \"location\": \"Office - Desk 5\",\n        \"assetImageUrl\": \"https://example.com/image.jpg\",\n        \"invoiceUrl\": \"https://example.com/invoice.pdf\",\n        \"assignedToEmployeeId\": \"emp_001\",\n        \"assignedDate\": \"2024-01-20T00:00:00Z\",\n        \"status\": \"ASSIGNED\",\n        \"createdAt\": \"2024-01-15T10:00:00Z\",\n        \"updatedAt\": \"2024-01-20T10:00:00Z\",\n        \"assignedToEmployee\": {\n          \"id\": \"emp_001\",\n          \"firstName\": \"John\",\n          \"lastName\": \"Doe\",\n          \"email\": \"john@example.com\",\n          \"designation\": \"Senior Developer\"\n        }\n      }\n    ],\n    \"total\": 25,\n    \"page\": 1,\n    \"pageSize\": 10,\n    \"totalPages\": 3\n  },\n  \"message\": \"Assets retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Asset by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/assets/{{asset_id}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["assets", "{{asset_id}}"]
+            },
+            "description": "Get single asset by ID"
+          },
+          "response": [
+            {
+              "name": "Get Asset Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/assets/asset_001",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["assets", "asset_001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"asset_001\",\n    \"assetName\": \"MacBook Pro 16\\\"\",\n    \"assetType\": \"MAIN_ASSET\",\n    \"category\": \"LAPTOP\",\n    \"serialNumber\": \"MBP123456\",\n    \"manufacturer\": \"Apple\",\n    \"purchaseDate\": \"2024-01-15T00:00:00Z\",\n    \"purchaseCost\": 2500,\n    \"description\": \"High-performance laptop\",\n    \"warrantyExpiration\": \"2026-01-15T00:00:00Z\",\n    \"location\": \"Office - Desk 5\",\n    \"assetImageUrl\": \"https://example.com/image.jpg\",\n    \"invoiceUrl\": \"https://example.com/invoice.pdf\",\n    \"assignedToEmployeeId\": \"emp_001\",\n    \"assignedDate\": \"2024-01-20T00:00:00Z\",\n    \"status\": \"ASSIGNED\",\n    \"createdAt\": \"2024-01-15T10:00:00Z\",\n    \"updatedAt\": \"2024-01-20T10:00:00Z\",\n    \"assignedToEmployee\": {\n      \"id\": \"emp_001\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"email\": \"john@example.com\",\n      \"designation\": \"Senior Developer\",\n      \"department\": {\"id\": \"dept_001\", \"name\": \"Engineering\"}\n    }\n  },\n  \"message\": \"Asset retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Asset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assetName\": \"MacBook Pro 16\\\"\",\n  \"assetType\": \"MAIN_ASSET\",\n  \"category\": \"LAPTOP\",\n  \"serialNumber\": \"MBP123456\",\n  \"manufacturer\": \"Apple\",\n  \"purchaseDate\": \"2024-01-15\",\n  \"purchaseCost\": 2500,\n  \"description\": \"High-performance laptop for development\",\n  \"warrantyExpiration\": \"2026-01-15\",\n  \"location\": \"Office - Desk 5\",\n  \"assetImageUrl\": \"https://example.com/image.jpg\",\n  \"invoiceUrl\": \"https://example.com/invoice.pdf\",\n  \"assignedToEmployeeId\": \"emp_001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/assets",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["assets"]
+            },
+            "description": "Create new asset"
+          },
+          "response": [
+            {
+              "name": "Create Asset Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assetName\": \"MacBook Pro 16\\\"\",\n  \"assetType\": \"MAIN_ASSET\",\n  \"category\": \"LAPTOP\",\n  \"serialNumber\": \"MBP123456\",\n  \"manufacturer\": \"Apple\",\n  \"purchaseDate\": \"2024-01-15\",\n  \"purchaseCost\": 2500\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/assets",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["assets"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"asset_001\",\n    \"assetName\": \"MacBook Pro 16\\\"\",\n    \"assetType\": \"MAIN_ASSET\",\n    \"category\": \"LAPTOP\",\n    \"serialNumber\": \"MBP123456\",\n    \"manufacturer\": \"Apple\",\n    \"purchaseDate\": \"2024-01-15T00:00:00Z\",\n    \"purchaseCost\": 2500,\n    \"status\": \"ASSIGNED\",\n    \"createdAt\": \"2024-01-15T10:00:00Z\",\n    \"updatedAt\": \"2024-01-15T10:00:00Z\"\n  },\n  \"message\": \"Asset created successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Asset",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": \"Office - Desk 6\",\n  \"description\": \"Updated description\",\n  \"warrantyExpiration\": \"2026-06-15\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/assets/{{asset_id}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["assets", "{{asset_id}}"]
+            },
+            "description": "Update asset information"
+          },
+          "response": [
+            {
+              "name": "Update Asset Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"location\": \"Office - Desk 6\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/assets/asset_001",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["assets", "asset_001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"asset_001\",\n    \"assetName\": \"MacBook Pro 16\\\"\",\n    \"location\": \"Office - Desk 6\",\n    \"updatedAt\": \"2024-01-21T10:00:00Z\"\n  },\n  \"message\": \"Asset updated successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Asset",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/assets/{{asset_id}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["assets", "{{asset_id}}"]
+            },
+            "description": "Delete asset"
+          },
+          "response": [
+            {
+              "name": "Delete Asset Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/assets/asset_001",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["assets", "asset_001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Asset deleted successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Asset Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/assets/stats",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["assets", "stats"]
+            },
+            "description": "Get asset inventory statistics"
+          },
+          "response": [
+            {
+              "name": "Get Statistics Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/assets/stats",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["assets", "stats"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totalAssets\": 25,\n    \"assignedAssets\": 15,\n    \"availableAssets\": 10,\n    \"totalCost\": 45000\n  },\n  \"message\": \"Asset statistics retrieved successfully\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Payroll Management",
+      "item": [
+        {
+          "name": "Get All Payroll Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/payroll?page=1&pageSize=10&status=PENDING&month=10&year=2025",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "pageSize", "value": "10"},
+                {"key": "status", "value": "PENDING", "disabled": true},
+                {"key": "month", "value": "10", "disabled": true},
+                {"key": "year", "value": "2025", "disabled": true}
+              ]
+            },
+            "description": "Get all payroll records with pagination and filters"
+          },
+          "response": [
+            {
+              "name": "Get Payroll Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/payroll?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll"],
+                  "query": [
+                    {"key": "page", "value": "1"},
+                    {"key": "pageSize", "value": "10"}
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"payroll\": [\n      {\n        \"id\": \"payroll_001\",\n        \"employeeId\": \"emp_001\",\n        \"month\": 10,\n        \"year\": 2025,\n        \"baseSalary\": 5000,\n        \"allowances\": 500,\n        \"deductions\": 200,\n        \"taxDeduction\": 0,\n        \"netSalary\": 5300,\n        \"status\": \"PENDING\",\n        \"paidDate\": null\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"pageSize\": 10,\n      \"total\": 50,\n      \"pages\": 5\n    }\n  },\n  \"message\": \"Payroll records retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Payroll by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/payroll/{{payroll_id}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "{{payroll_id}}"]
+            },
+            "description": "Get single payroll record details"
+          },
+          "response": [
+            {
+              "name": "Get Payroll Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/payroll/payroll_001",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "payroll_001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"payroll_001\",\n    \"employeeId\": \"emp_001\",\n    \"month\": 10,\n    \"year\": 2025,\n    \"baseSalary\": 5000,\n    \"allowances\": 500,\n    \"deductions\": 200,\n    \"taxDeduction\": 0,\n    \"netSalary\": 5300,\n    \"status\": \"PENDING\",\n    \"paidDate\": null\n  },\n  \"message\": \"Payroll record retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Generate Payroll for Month",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": 10,\n  \"year\": 2025,\n  \"employeeIds\": []\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/payroll/generate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "generate"]
+            },
+            "description": "Generate monthly payroll for all or specific employees"
+          },
+          "response": [
+            {
+              "name": "Generate Payroll Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"month\": 10,\n  \"year\": 2025\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/payroll/generate",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "generate"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"created\": [\n      {\n        \"id\": \"payroll_001\",\n        \"employeeId\": \"emp_001\",\n        \"month\": 10,\n        \"year\": 2025,\n        \"baseSalary\": 5000,\n        \"allowances\": 500,\n        \"deductions\": 200,\n        \"netSalary\": 5300,\n        \"status\": \"PENDING\"\n      }\n    ],\n    \"skipped\": [],\n    \"summary\": {\n      \"totalProcessed\": 1,\n      \"totalSkipped\": 0,\n      \"month\": 10,\n      \"year\": 2025\n    }\n  },\n  \"message\": \"Payroll generated for 10/2025\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Payroll Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PAID\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/payroll/{{payroll_id}}/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "{{payroll_id}}", "status"]
+            },
+            "description": "Update payroll status (PENDING, PROCESSED, PAID, FAILED)"
+          },
+          "response": [
+            {
+              "name": "Update Status Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"PAID\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/payroll/payroll_001/status",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "payroll_001", "status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"payroll_001\",\n    \"status\": \"PAID\",\n    \"paidDate\": \"2025-10-21T10:00:00Z\"\n  },\n  \"message\": \"Payroll status updated to PAID\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Salary Changes",
+      "item": [
+        {
+          "name": "Get All Salary Changes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/payroll/salary-changes?page=1&pageSize=10&status=PENDING",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "salary-changes"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "pageSize", "value": "10"},
+                {"key": "status", "value": "PENDING", "disabled": true},
+                {"key": "search", "value": "", "disabled": true}
+              ]
+            },
+            "description": "Get all salary change requests with pagination and filters"
+          },
+          "response": [
+            {
+              "name": "Get Salary Changes Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/payroll/salary-changes?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "salary-changes"],
+                  "query": [
+                    {"key": "page", "value": "1"},
+                    {"key": "pageSize", "value": "10"}
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"salaryChanges\": [\n      {\n        \"id\": \"sc_001\",\n        \"employeeId\": \"emp_001\",\n        \"oldSalary\": 5000,\n        \"newSalary\": 5500,\n        \"changeType\": \"PROMOTION\",\n        \"reason\": \"Promoted to Senior Developer\",\n        \"effectiveDate\": \"2025-11-01T00:00:00Z\",\n        \"status\": \"PENDING\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"pageSize\": 10,\n      \"total\": 25,\n      \"pages\": 3\n    }\n  },\n  \"message\": \"Salary change requests retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Salary Change",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"newSalary\": 5500,\n  \"changeType\": \"PROMOTION\",\n  \"reason\": \"Promoted to Senior Developer\",\n  \"effectiveDate\": \"2025-11-01\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/payroll/salary-changes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "salary-changes"]
+            },
+            "description": "Create new salary change request"
+          },
+          "response": [
+            {
+              "name": "Create Salary Change Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employeeId\": \"emp_001\",\n  \"newSalary\": 5500,\n  \"changeType\": \"PROMOTION\",\n  \"reason\": \"Promoted to Senior Developer\",\n  \"effectiveDate\": \"2025-11-01\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/payroll/salary-changes",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "salary-changes"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"sc_001\",\n    \"employeeId\": \"emp_001\",\n    \"oldSalary\": 5000,\n    \"newSalary\": 5500,\n    \"changeType\": \"PROMOTION\",\n    \"reason\": \"Promoted to Senior Developer\",\n    \"effectiveDate\": \"2025-11-01T00:00:00Z\",\n    \"status\": \"PENDING\"\n  },\n  \"message\": \"Salary change request created successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve by HR",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/payroll/salary-changes/{{salary_change_id}}/approve-hr",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "salary-changes", "{{salary_change_id}}", "approve-hr"]
+            },
+            "description": "HR approval step"
+          },
+          "response": [
+            {
+              "name": "Approve by HR Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/payroll/salary-changes/sc_001/approve-hr",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "salary-changes", "sc_001", "approve-hr"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"sc_001\",\n    \"status\": \"APPROVED_BY_HR\",\n    \"approvedByHR\": \"user_001\",\n    \"approvedByHRDate\": \"2025-10-21T10:05:00Z\"\n  },\n  \"message\": \"Salary change approved by HR\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve by Management",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/payroll/salary-changes/{{salary_change_id}}/approve-management",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "salary-changes", "{{salary_change_id}}", "approve-management"]
+            },
+            "description": "Management approval step"
+          },
+          "response": [
+            {
+              "name": "Approve by Management Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/payroll/salary-changes/sc_001/approve-management",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "salary-changes", "sc_001", "approve-management"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"sc_001\",\n    \"status\": \"APPROVED_BY_MANAGEMENT\",\n    \"approvedByMgmt\": \"user_002\",\n    \"approvedByMgmtDate\": \"2025-10-21T10:10:00Z\"\n  },\n  \"message\": \"Salary change approved by Management\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve by Finance",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/payroll/salary-changes/{{salary_change_id}}/approve-finance",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "salary-changes", "{{salary_change_id}}", "approve-finance"]
+            },
+            "description": "Finance approval (final step) - automatically updates salary if effective date is today or past"
+          },
+          "response": [
+            {
+              "name": "Approve by Finance Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/payroll/salary-changes/sc_001/approve-finance",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "salary-changes", "sc_001", "approve-finance"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"sc_001\",\n    \"status\": \"APPROVED_BY_FINANCE\",\n    \"approvedByFin\": \"user_003\",\n    \"approvedByFinDate\": \"2025-10-21T10:15:00Z\"\n  },\n  \"message\": \"Salary change approved by Finance and activated\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reject Salary Change",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Budget constraints for this quarter\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/payroll/salary-changes/{{salary_change_id}}/reject",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "salary-changes", "{{salary_change_id}}", "reject"]
+            },
+            "description": "Reject salary change request at any approval stage"
+          },
+          "response": [
+            {
+              "name": "Reject Salary Change Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rejectionReason\": \"Budget constraints for this quarter\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/payroll/salary-changes/sc_001/reject",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "salary-changes", "sc_001", "reject"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"sc_001\",\n    \"status\": \"REJECTED\",\n    \"rejectionReason\": \"Budget constraints for this quarter\",\n    \"rejectedBy\": \"user_002\",\n    \"rejectedDate\": \"2025-10-21T10:20:00Z\"\n  },\n  \"message\": \"Salary change request rejected\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Salary History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/payroll/salary-history/{{employee_id}}?page=1&pageSize=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["payroll", "salary-history", "{{employee_id}}"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "pageSize", "value": "10"}
+              ]
+            },
+            "description": "Get approved salary changes for an employee"
+          },
+          "response": [
+            {
+              "name": "Get Salary History Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/payroll/salary-history/emp_001?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["payroll", "salary-history", "emp_001"],
+                  "query": [
+                    {"key": "page", "value": "1"},
+                    {"key": "pageSize", "value": "10"}
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"salaryChanges\": [\n      {\n        \"id\": \"sc_001\",\n        \"employeeId\": \"emp_001\",\n        \"oldSalary\": 5000,\n        \"newSalary\": 5500,\n        \"changeType\": \"PROMOTION\",\n        \"reason\": \"Promoted to Senior Developer\",\n        \"effectiveDate\": \"2025-11-01T00:00:00Z\",\n        \"status\": \"APPROVED_BY_FINANCE\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"pageSize\": 10,\n      \"total\": 3,\n      \"pages\": 1\n    }\n  },\n  \"message\": \"Salary history retrieved successfully\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reimbursements",
+      "item": [
+        {
+          "name": "Submit Reimbursement Claim",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500.00,\n  \"category\": \"Travel\",\n  \"description\": \"Flight ticket to Dubai for client meeting\",\n  \"receiptUrl\": \"https://storage.example.com/receipt-123.pdf\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/reimbursements",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["reimbursements"]
+            },
+            "description": "Submit a new reimbursement claim"
+          },
+          "response": [
+            {
+              "name": "Submit Claim Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 500.00,\n  \"category\": \"Travel\",\n  \"description\": \"Flight ticket to Dubai for client meeting\",\n  \"receiptUrl\": \"https://storage.example.com/receipt-123.pdf\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/reimbursements",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["reimbursements"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cmh0do529000l9k2pbyyojlw1\",\n    \"employeeId\": \"cmh0cibsq000i9kh3fur16h33\",\n    \"amount\": 500.00,\n    \"category\": \"Travel\",\n    \"description\": \"Flight ticket to Dubai for client meeting\",\n    \"receiptUrl\": \"https://storage.example.com/receipt-123.pdf\",\n    \"status\": \"PENDING\",\n    \"approvedBy\": null,\n    \"approvalDate\": null,\n    \"rejectionReason\": null,\n    \"createdAt\": \"2025-10-21T10:30:00.000Z\",\n    \"updatedAt\": \"2025-10-21T10:30:00.000Z\"\n  },\n  \"message\": \"Reimbursement claim submitted successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Reimbursement Claims",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/reimbursements?page=1&pageSize=10&status=PENDING",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["reimbursements"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "pageSize", "value": "10"},
+                {"key": "status", "value": "PENDING", "disabled": true},
+                {"key": "employeeId", "value": "", "disabled": true},
+                {"key": "category", "value": "", "disabled": true},
+                {"key": "startDate", "value": "", "disabled": true},
+                {"key": "endDate", "value": "", "disabled": true}
+              ]
+            },
+            "description": "Get all reimbursement claims with pagination and filters"
+          },
+          "response": [
+            {
+              "name": "List Claims Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/reimbursements?page=1&pageSize=10",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["reimbursements"],
+                  "query": [
+                    {"key": "page", "value": "1"},
+                    {"key": "pageSize", "value": "10"}
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"reimbursements\": [\n      {\n        \"id\": \"cmh0do529000l9k2pbyyojlw1\",\n        \"employeeId\": \"cmh0cibsq000i9kh3fur16h33\",\n        \"amount\": 500.00,\n        \"category\": \"Travel\",\n        \"description\": \"Flight ticket to Dubai for client meeting\",\n        \"receiptUrl\": \"https://storage.example.com/receipt-123.pdf\",\n        \"status\": \"PENDING\",\n        \"approvedBy\": null,\n        \"approvalDate\": null,\n        \"rejectionReason\": null,\n        \"createdAt\": \"2025-10-21T10:30:00.000Z\",\n        \"updatedAt\": \"2025-10-21T10:30:00.000Z\",\n        \"employee\": {\n          \"id\": \"cmh0cibsq000i9kh3fur16h33\",\n          \"firstName\": \"John\",\n          \"lastName\": \"Doe\",\n          \"email\": \"john.doe@yazmedia.com\",\n          \"employeeId\": \"EMP002\",\n          \"designation\": \"Senior Developer\"\n        }\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"pageSize\": 10,\n      \"total\": 25,\n      \"pages\": 3\n    }\n  },\n  \"message\": \"Reimbursement claims retrieved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Reimbursement Claim",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/reimbursements/{{reimbursement_id}}/approve",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["reimbursements", "{{reimbursement_id}}", "approve"]
+            },
+            "description": "Approve a reimbursement claim"
+          },
+          "response": [
+            {
+              "name": "Approve Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "http://localhost:3000/reimbursements/cmh0do529000l9k2pbyyojlw1/approve",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["reimbursements", "cmh0do529000l9k2pbyyojlw1", "approve"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cmh0do529000l9k2pbyyojlw1\",\n    \"employeeId\": \"cmh0cibsq000i9kh3fur16h33\",\n    \"amount\": 500.00,\n    \"category\": \"Travel\",\n    \"description\": \"Flight ticket to Dubai for client meeting\",\n    \"receiptUrl\": \"https://storage.example.com/receipt-123.pdf\",\n    \"status\": \"APPROVED\",\n    \"approvedBy\": \"admin@yazmedia.com\",\n    \"approvalDate\": \"2025-10-21T11:30:00.000Z\",\n    \"rejectionReason\": null,\n    \"createdAt\": \"2025-10-21T10:30:00.000Z\",\n    \"updatedAt\": \"2025-10-21T11:30:00.000Z\"\n  },\n  \"message\": \"Reimbursement claim approved successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reject Reimbursement Claim",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Receipt not provided. Please resubmit with valid receipt.\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/reimbursements/{{reimbursement_id}}/reject",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["reimbursements", "{{reimbursement_id}}", "reject"]
+            },
+            "description": "Reject a reimbursement claim with reason"
+          },
+          "response": [
+            {
+              "name": "Reject Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rejectionReason\": \"Receipt not provided. Please resubmit with valid receipt.\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/reimbursements/cmh0do529000l9k2pbyyojlw1/reject",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["reimbursements", "cmh0do529000l9k2pbyyojlw1", "reject"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cmh0do529000l9k2pbyyojlw1\",\n    \"employeeId\": \"cmh0cibsq000i9kh3fur16h33\",\n    \"amount\": 500.00,\n    \"category\": \"Travel\",\n    \"description\": \"Flight ticket to Dubai for client meeting\",\n    \"receiptUrl\": \"https://storage.example.com/receipt-123.pdf\",\n    \"status\": \"REJECTED\",\n    \"approvedBy\": null,\n    \"approvalDate\": null,\n    \"rejectionReason\": \"Receipt not provided. Please resubmit with valid receipt.\",\n    \"createdAt\": \"2025-10-21T10:30:00.000Z\",\n    \"updatedAt\": \"2025-10-21T11:45:00.000Z\"\n  },\n  \"message\": \"Reimbursement claim rejected successfully\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from login - set this after login"
+    },
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "employee_id",
+      "value": "",
+      "type": "string",
+      "description": "Employee ID from get all employees response"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string",
+      "description": "User ID from get all users response"
+    },
+    {
+      "key": "announcement_id",
+      "value": "",
+      "type": "string",
+      "description": "Announcement ID from get all announcements response"
+    },
+    {
+      "key": "asset_id",
+      "value": "",
+      "type": "string",
+      "description": "Asset ID from get all assets response"
+    },
+    {
+      "key": "leave_request_id",
+      "value": "",
+      "type": "string",
+      "description": "Leave Request ID from get leave requests response"
+    },
+    {
+      "key": "document_id",
+      "value": "",
+      "type": "string",
+      "description": "Document ID from get documents response"
+    },
+    {
+      "key": "payroll_id",
+      "value": "",
+      "type": "string",
+      "description": "Payroll ID from get payroll records response"
+    },
+    {
+      "key": "salary_change_id",
+      "value": "",
+      "type": "string",
+      "description": "Salary Change ID from get salary changes response"
+    },
+    {
+      "key": "reimbursement_id",
+      "value": "",
+      "type": "string",
+      "description": "Reimbursement ID from list reimbursements response"
+    }
+  ]
+}
+
